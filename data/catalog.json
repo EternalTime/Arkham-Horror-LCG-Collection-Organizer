@@ -1,0 +1,1259 @@
+[
+ {
+  "name": "Core Set",
+  "group": "Core Sets",
+  "packs": [
+   [
+    "core",
+    null
+   ]
+  ],
+  "note": "original 2016 core box"
+ },
+ {
+  "name": "Revised Core Set",
+  "group": "Core Sets",
+  "packs": [
+   [
+    "rcore",
+    null
+   ],
+   [
+    "core",
+    "encounter"
+   ]
+  ],
+  "note": "player cards under rcore; its encounter cards are catalogued under the original core"
+ },
+ {
+  "name": "Core Set (2026)",
+  "group": "Core Sets",
+  "packs": [
+   [
+    "core_2026",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Dunwich Legacy Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "dwl",
+    "player"
+   ],
+   [
+    "tmm",
+    "player"
+   ],
+   [
+    "tece",
+    "player"
+   ],
+   [
+    "bota",
+    "player"
+   ],
+   [
+    "uau",
+    "player"
+   ],
+   [
+    "wda",
+    "player"
+   ],
+   [
+    "litas",
+    "player"
+   ]
+  ],
+  "note": "repackaged; player cards of the original cycle"
+ },
+ {
+  "name": "The Dunwich Legacy Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "dwl",
+    "encounter"
+   ],
+   [
+    "tmm",
+    "encounter"
+   ],
+   [
+    "tece",
+    "encounter"
+   ],
+   [
+    "bota",
+    "encounter"
+   ],
+   [
+    "uau",
+    "encounter"
+   ],
+   [
+    "wda",
+    "encounter"
+   ],
+   [
+    "litas",
+    "encounter"
+   ]
+  ],
+  "note": "repackaged; encounter cards of the original cycle"
+ },
+ {
+  "name": "The Dunwich Legacy (original deluxe + Mythos packs)",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "dwl",
+    null
+   ],
+   [
+    "tmm",
+    null
+   ],
+   [
+    "tece",
+    null
+   ],
+   [
+    "bota",
+    null
+   ],
+   [
+    "uau",
+    null
+   ],
+   [
+    "wda",
+    null
+   ],
+   [
+    "litas",
+    null
+   ]
+  ],
+  "note": "complete original cycle; equivalent to owning both repackaged boxes"
+ },
+ {
+  "name": "The Path to Carcosa Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "ptc",
+    "player"
+   ],
+   [
+    "eotp",
+    "player"
+   ],
+   [
+    "tuo",
+    "player"
+   ],
+   [
+    "apot",
+    "player"
+   ],
+   [
+    "tpm",
+    "player"
+   ],
+   [
+    "bsr",
+    "player"
+   ],
+   [
+    "dca",
+    "player"
+   ]
+  ],
+  "note": "repackaged; player cards of the original cycle"
+ },
+ {
+  "name": "The Path to Carcosa Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "ptc",
+    "encounter"
+   ],
+   [
+    "eotp",
+    "encounter"
+   ],
+   [
+    "tuo",
+    "encounter"
+   ],
+   [
+    "apot",
+    "encounter"
+   ],
+   [
+    "tpm",
+    "encounter"
+   ],
+   [
+    "bsr",
+    "encounter"
+   ],
+   [
+    "dca",
+    "encounter"
+   ]
+  ],
+  "note": "repackaged; encounter cards of the original cycle"
+ },
+ {
+  "name": "The Path to Carcosa (original deluxe + Mythos packs)",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "ptc",
+    null
+   ],
+   [
+    "eotp",
+    null
+   ],
+   [
+    "tuo",
+    null
+   ],
+   [
+    "apot",
+    null
+   ],
+   [
+    "tpm",
+    null
+   ],
+   [
+    "bsr",
+    null
+   ],
+   [
+    "dca",
+    null
+   ]
+  ],
+  "note": "complete original cycle; equivalent to owning both repackaged boxes"
+ },
+ {
+  "name": "The Forgotten Age Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tfa",
+    "player"
+   ],
+   [
+    "tof",
+    "player"
+   ],
+   [
+    "tbb",
+    "player"
+   ],
+   [
+    "hote",
+    "player"
+   ],
+   [
+    "tcoa",
+    "player"
+   ],
+   [
+    "tdoy",
+    "player"
+   ],
+   [
+    "sha",
+    "player"
+   ]
+  ],
+  "note": "repackaged; player cards of the original cycle"
+ },
+ {
+  "name": "The Forgotten Age Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tfa",
+    "encounter"
+   ],
+   [
+    "tof",
+    "encounter"
+   ],
+   [
+    "tbb",
+    "encounter"
+   ],
+   [
+    "hote",
+    "encounter"
+   ],
+   [
+    "tcoa",
+    "encounter"
+   ],
+   [
+    "tdoy",
+    "encounter"
+   ],
+   [
+    "sha",
+    "encounter"
+   ]
+  ],
+  "note": "repackaged; encounter cards of the original cycle"
+ },
+ {
+  "name": "The Forgotten Age (original deluxe + Mythos packs)",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tfa",
+    null
+   ],
+   [
+    "tof",
+    null
+   ],
+   [
+    "tbb",
+    null
+   ],
+   [
+    "hote",
+    null
+   ],
+   [
+    "tcoa",
+    null
+   ],
+   [
+    "tdoy",
+    null
+   ],
+   [
+    "sha",
+    null
+   ]
+  ],
+  "note": "complete original cycle; equivalent to owning both repackaged boxes"
+ },
+ {
+  "name": "The Circle Undone Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tcu",
+    "player"
+   ],
+   [
+    "tsn",
+    "player"
+   ],
+   [
+    "wos",
+    "player"
+   ],
+   [
+    "fgg",
+    "player"
+   ],
+   [
+    "uad",
+    "player"
+   ],
+   [
+    "icc",
+    "player"
+   ],
+   [
+    "bbt",
+    "player"
+   ]
+  ],
+  "note": "repackaged; player cards of the original cycle"
+ },
+ {
+  "name": "The Circle Undone Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tcu",
+    "encounter"
+   ],
+   [
+    "tsn",
+    "encounter"
+   ],
+   [
+    "wos",
+    "encounter"
+   ],
+   [
+    "fgg",
+    "encounter"
+   ],
+   [
+    "uad",
+    "encounter"
+   ],
+   [
+    "icc",
+    "encounter"
+   ],
+   [
+    "bbt",
+    "encounter"
+   ]
+  ],
+  "note": "repackaged; encounter cards of the original cycle"
+ },
+ {
+  "name": "The Circle Undone (original deluxe + Mythos packs)",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tcu",
+    null
+   ],
+   [
+    "tsn",
+    null
+   ],
+   [
+    "wos",
+    null
+   ],
+   [
+    "fgg",
+    null
+   ],
+   [
+    "uad",
+    null
+   ],
+   [
+    "icc",
+    null
+   ],
+   [
+    "bbt",
+    null
+   ]
+  ],
+  "note": "complete original cycle; equivalent to owning both repackaged boxes"
+ },
+ {
+  "name": "The Dream-Eaters Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tde",
+    "player"
+   ],
+   [
+    "sfk",
+    "player"
+   ],
+   [
+    "tsh",
+    "player"
+   ],
+   [
+    "dsm",
+    "player"
+   ],
+   [
+    "pnr",
+    "player"
+   ],
+   [
+    "wgd",
+    "player"
+   ],
+   [
+    "woc",
+    "player"
+   ]
+  ],
+  "note": "repackaged; player cards of the original cycle"
+ },
+ {
+  "name": "The Dream-Eaters Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tde",
+    "encounter"
+   ],
+   [
+    "sfk",
+    "encounter"
+   ],
+   [
+    "tsh",
+    "encounter"
+   ],
+   [
+    "dsm",
+    "encounter"
+   ],
+   [
+    "pnr",
+    "encounter"
+   ],
+   [
+    "wgd",
+    "encounter"
+   ],
+   [
+    "woc",
+    "encounter"
+   ]
+  ],
+  "note": "repackaged; encounter cards of the original cycle"
+ },
+ {
+  "name": "The Dream-Eaters (original deluxe + Mythos packs)",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tde",
+    null
+   ],
+   [
+    "sfk",
+    null
+   ],
+   [
+    "tsh",
+    null
+   ],
+   [
+    "dsm",
+    null
+   ],
+   [
+    "pnr",
+    null
+   ],
+   [
+    "wgd",
+    null
+   ],
+   [
+    "woc",
+    null
+   ]
+  ],
+  "note": "complete original cycle; equivalent to owning both repackaged boxes"
+ },
+ {
+  "name": "The Innsmouth Conspiracy Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tic",
+    "player"
+   ],
+   [
+    "itd",
+    "player"
+   ],
+   [
+    "def",
+    "player"
+   ],
+   [
+    "hhg",
+    "player"
+   ],
+   [
+    "lif",
+    "player"
+   ],
+   [
+    "lod",
+    "player"
+   ],
+   [
+    "itm",
+    "player"
+   ]
+  ],
+  "note": "repackaged; player cards of the original cycle"
+ },
+ {
+  "name": "The Innsmouth Conspiracy Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tic",
+    "encounter"
+   ],
+   [
+    "itd",
+    "encounter"
+   ],
+   [
+    "def",
+    "encounter"
+   ],
+   [
+    "hhg",
+    "encounter"
+   ],
+   [
+    "lif",
+    "encounter"
+   ],
+   [
+    "lod",
+    "encounter"
+   ],
+   [
+    "itm",
+    "encounter"
+   ]
+  ],
+  "note": "repackaged; encounter cards of the original cycle"
+ },
+ {
+  "name": "The Innsmouth Conspiracy (original deluxe + Mythos packs)",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tic",
+    null
+   ],
+   [
+    "itd",
+    null
+   ],
+   [
+    "def",
+    null
+   ],
+   [
+    "hhg",
+    null
+   ],
+   [
+    "lif",
+    null
+   ],
+   [
+    "lod",
+    null
+   ],
+   [
+    "itm",
+    null
+   ]
+  ],
+  "note": "complete original cycle; equivalent to owning both repackaged boxes"
+ },
+ {
+  "name": "Edge of the Earth Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "eoep",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Edge of the Earth Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "eoec",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Scarlet Keys Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tskp",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Scarlet Keys Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tskc",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Feast of Hemlock Vale Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "fhvp",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Feast of Hemlock Vale Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "fhvc",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Drowned City Investigator Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tdcp",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Drowned City Campaign Expansion",
+  "group": "Campaign Expansions",
+  "packs": [
+   [
+    "tdcc",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Return to the Night of the Zealot",
+  "group": "Return to...",
+  "packs": [
+   [
+    "rtnotz",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Return to the Dunwich Legacy",
+  "group": "Return to...",
+  "packs": [
+   [
+    "rtdwl",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Return to the Path to Carcosa",
+  "group": "Return to...",
+  "packs": [
+   [
+    "rtptc",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Return to the Forgotten Age",
+  "group": "Return to...",
+  "packs": [
+   [
+    "rttfa",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Return to the Circle Undone",
+  "group": "Return to...",
+  "packs": [
+   [
+    "rttcu",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Nathaniel Cho Starter",
+  "group": "Investigator Starter Decks",
+  "packs": [
+   [
+    "nat",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Harvey Walters Starter",
+  "group": "Investigator Starter Decks",
+  "packs": [
+   [
+    "har",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Winifred Habbamock Starter",
+  "group": "Investigator Starter Decks",
+  "packs": [
+   [
+    "win",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Jacqueline Fine Starter",
+  "group": "Investigator Starter Decks",
+  "packs": [
+   [
+    "jac",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Stella Clark Starter",
+  "group": "Investigator Starter Decks",
+  "packs": [
+   [
+    "ste",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Tommy Muldoon Pack",
+  "group": "Investigator Packs (2026)",
+  "packs": [
+   [
+    "tom",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Carolyn Fern Pack",
+  "group": "Investigator Packs (2026)",
+  "packs": [
+   [
+    "car",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "André Patel Pack",
+  "group": "Investigator Packs (2026)",
+  "packs": [
+   [
+    "and",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Marie Lambeau Pack",
+  "group": "Investigator Packs (2026)",
+  "packs": [
+   [
+    "mar",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Miguel de la Cruz Pack",
+  "group": "Investigator Packs (2026)",
+  "packs": [
+   [
+    "mig",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Curse of the Rougarou",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "cotr",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Carnevale of Horrors",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "coh",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Labyrinths of Lunacy",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "lol",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Guardians of the Abyss",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "guardians",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Murder at the Excelsior Hotel",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "hotel",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Blob That Ate Everything",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "blob",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "War of the Outer Gods",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "wog",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Machinations Through Time",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "mtt",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Fortune and Folly",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "fof",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Blob That Ate Everything ELSE!",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "blbe",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "The Midwinter Gala",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "tmg",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Film Fatale",
+  "group": "Standalone Scenarios",
+  "packs": [
+   [
+    "film_fatale",
+    null
+   ]
+  ]
+ },
+ {
+  "name": "Read or Die (Daisy Walker)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "rod",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "All or Nothing (\"Skids\" O'Toole)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "aon",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Bad Blood (Agnes Baker)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "bad",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "By the Book (Roland Banks)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "btb",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Red Tide Rising (Wendy Adams)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "rtr",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "On the Road Again (\"Ashcan\" Pete)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "otr",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Laid to Rest (Jim Culver)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "ltr",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Path of the Righteous (Zoey Samaras)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "ptr",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Relics of the Past (Monterey Jack)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "rop",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Hunting for Answers (Rex Murphy)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "hfa",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Pistols and Pearls (Jenny Barnes)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "pap",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Aura of Faith (Father Mateo)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "aof",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Enthralling Encore (Lola Hayes)",
+  "group": "Parallel Investigators (print-and-play)",
+  "packs": [
+   [
+    "enc",
+    null
+   ]
+  ],
+  "note": "free PDF on FFG's support page"
+ },
+ {
+  "name": "Hour of the Huntress",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "hoth",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "The Dirge of Reason",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "tdor",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "Ire of the Void",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "iotv",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "The Deep Gate",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "tdg",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "To Fight the Black Wind",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "tftbw",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "Blood of Baalshandor",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "bob",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "Dark Revelations",
+  "group": "Novella Promos",
+  "packs": [
+   [
+    "dre",
+    null
+   ]
+  ],
+  "note": "promo cards bundled with the novella"
+ },
+ {
+  "name": "Promotional Cards",
+  "group": "Promos",
+  "packs": [
+   [
+    "promo",
+    null
+   ]
+  ],
+  "note": "convention/organized-play promos on ArkhamDB"
+ },
+ {
+  "name": "Books (misc promo cards)",
+  "group": "Promos",
+  "packs": [
+   [
+    "books",
+    null
+   ]
+  ]
+ }
+]

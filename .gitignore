@@ -1,0 +1,23 @@
+# per-user: which products you own
+collection.json
+
+# downloaded content (FFG's copyrighted material - never commit)
+images/
+boxart/
+guides/
+
+# generated from collection.json + downloads
+data/cards.json
+data/cards.js
+data/scenarios.json
+data/scenarios.js
+data/docs.js
+
+# your decks / campaign exports
+decks/*
+!decks/.gitkeep
+
+# caches
+scripts/.pack_cache/
+__pycache__/
+.DS_Store

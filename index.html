@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AHLCG Collection</title>
+<style>
+  :root { --bg:#1b1b1f; --panel:#26262c; --text:#e8e6e0; --dim:#9a978f; --accent:#c8a24a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui, sans-serif; }
+  header { padding:12px 16px; background:var(--panel); position:sticky; top:0; z-index:10;
+           display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  header input, header select {
+    background:var(--bg); color:var(--text); border:1px solid #444; border-radius:4px; padding:6px 8px; }
+  header input { width:220px; }
+  #count { color:var(--dim); margin-left:auto; }
+  #grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:10px; padding:12px; }
+  .card { background:var(--panel); border-radius:6px; overflow:hidden; cursor:pointer; }
+  .card img { width:100%; display:block; }
+  .card .cap { padding:4px 6px; font-size:12px; color:var(--dim); white-space:nowrap;
+               overflow:hidden; text-overflow:ellipsis; }
+  .card .cap b { color:var(--text); font-weight:600; }
+  .noimg { aspect-ratio:5/7; display:flex; align-items:center; justify-content:center;
+           padding:10px; text-align:center; color:var(--dim); }
+  #more { display:block; margin:16px auto 24px; padding:8px 20px; background:var(--panel);
+          color:var(--text); border:1px solid #444; border-radius:4px; cursor:pointer; }
+  #overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); display:none;
+             align-items:flex-start; justify-content:center; z-index:20; overflow:auto; padding:24px; }
+  #detail { background:var(--panel); border-radius:8px; max-width:900px; width:100%;
+            display:flex; gap:16px; padding:16px; flex-wrap:wrap; }
+  #detail img { width:300px; max-width:45%; height:fit-content; border-radius:6px; }
+  #detail .info { flex:1; min-width:260px; }
+  #detail h2 { margin:0 0 2px; } #detail h3 { margin:0 0 10px; color:var(--dim); font-weight:400; }
+  #detail .meta { color:var(--accent); margin-bottom:8px; }
+  #detail .text { white-space:pre-wrap; margin-bottom:10px; }
+  #detail .prov { color:var(--dim); font-size:13px; }
+  #detail a { color:var(--accent); }
+  .cls-guardian{color:#5cb8ff}.cls-seeker{color:#f2b64c}.cls-rogue{color:#4cd97a}
+  .cls-mystic{color:#c08cff}.cls-survivor{color:#ff7a66}.cls-neutral{color:#bbb}
+  .cls-mythos{color:#8f8}.cls-multi{color:#e8d44c}
+  /* deckbuilder */
+  #btnDecks { background:var(--bg); color:var(--text); border:1px solid #444;
+              border-radius:4px; padding:6px 12px; cursor:pointer; }
+  body.building #btnDecks { border-color:var(--accent); color:var(--accent); }
+  #builder { display:none; position:fixed; top:0; right:0; bottom:0; width:360px;
+             background:var(--panel); border-left:1px solid #3a3a42; z-index:15;
+             overflow-y:auto; padding:12px; font-size:13px; }
+  body.building #builder { display:block; }
+  body.building header, body.building #grid, body.building #more { margin-right:360px; }
+  #builder h2 { font-size:16px; margin:4px 0 8px; }
+  #builder h3 { font-size:13px; margin:10px 0 4px; color:var(--accent); }
+  #builder button { background:var(--bg); color:var(--text); border:1px solid #444;
+                    border-radius:4px; padding:4px 8px; cursor:pointer; margin:2px 2px 2px 0; }
+  #builder button.primary { border-color:var(--accent); color:var(--accent); }
+  #builder button.danger { border-color:#a33; color:#e88; }
+  #builder input, #builder select, #builder textarea {
+    background:var(--bg); color:var(--text); border:1px solid #444;
+    border-radius:4px; padding:4px 6px; max-width:100%; }
+  #builder input[type=number] { width:52px; }
+  #builder .row { margin:4px 0; }
+  #builder .deckline { display:flex; align-items:center; gap:8px; margin:8px 0;
+                       padding:12px 14px; background:rgba(0,0,0,.28);
+                       border:1px solid color-mix(in srgb, var(--dc, var(--accent)) 55%, var(--line));
+                       border-radius:16px;
+                       box-shadow:0 0 10px -2px color-mix(in srgb, var(--dc, var(--accent)) 30%, transparent);
+                       transition:border-color .12s, box-shadow .12s; }
+  #builder .deckline:hover { border-color:var(--dc, var(--accent));
+                             box-shadow:0 0 14px -2px color-mix(in srgb, var(--dc, var(--accent)) 60%, transparent); }
+  #builder .deckline[draggable] { cursor:grab; }
+  #builder .deckline.dragover { border-style:dashed; border-color:var(--accent2);
+                                box-shadow:0 0 14px -2px var(--accent2); }
+  #builder .deckline .nm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+                           cursor:pointer; font-family:'Arkhamic', serif; font-size:17px;
+                           letter-spacing:1px; color:var(--accent2); }
+  #builder .deckline .nm:hover { color:var(--accent); }
+  #builder .warn { color:#e88; }
+  #builder .ok { color:#8d8; }
+  #builder .dim { color:var(--dim); }
+  #builder table { border-collapse:collapse; width:100%; font-size:12px; }
+  #builder td, #builder th { border:1px solid #3a3a42; padding:2px 4px; text-align:center; }
+  #builder .slotline { display:flex; align-items:center; gap:4px; padding:1px 0; }
+  #builder .slotline .nm { flex:1; cursor:pointer; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  #builder .slotline .nm:hover { color:var(--accent); }
+  #builder .slotline button { padding:0 6px; margin:0; }
+  #toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+           background:#3a2a2a; color:#f0c0c0; border:1px solid #a33; border-radius:6px;
+           padding:10px 16px; z-index:40; display:none; max-width:70%; }
+  .card .addbar { display:flex; gap:4px; padding:2px 6px 6px; }
+  .card .addbar button { flex:1; background:var(--bg); color:var(--text);
+    border:1px solid #444; border-radius:4px; cursor:pointer; padding:2px 0; }
+  .card .addbar .inq { color:var(--accent); padding:2px 6px; }
+  .sechead { grid-column:1/-1; margin:14px 0 0; }
+  .sechead h2 { margin:0; font-size:18px; }
+  .sechead .note { color:var(--dim); font-size:12px; }
+  .sethead { grid-column:1/-1; color:var(--accent); font-size:14px;
+             border-bottom:1px solid #3a3a42; padding-bottom:2px; }
+</style>
+<style id="theme">
+  @font-face { font-family:'Arkhamic'; src:url('fonts/Arkhamic.ttf') format('truetype'); font-display:swap; }
+  @font-face { font-family:'EB Garamond'; src:url('fonts/EBGaramond.ttf') format('truetype');
+               font-weight:400 800; font-display:swap; }
+  @font-face { font-family:'EB Garamond'; src:url('fonts/EBGaramond-Italic.ttf') format('truetype');
+               font-weight:400 800; font-style:italic; font-display:swap; }
+  :root { --bg:#131318; --panel:#1c1c24; --panel2:#22222c; --line:#32323e;
+          --text:#e8e4d8; --dim:#9a968a; --accent:#c8a24a; --accent2:#e6c876; }
+  html { scrollbar-color:#3a3a46 var(--bg); }
+  ::-webkit-scrollbar { width:11px; height:11px; }
+  ::-webkit-scrollbar-thumb { background:#3a3a46; border-radius:6px; border:2px solid var(--bg); }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  body { background: radial-gradient(1100px 500px at 50% -120px, #232331, var(--bg)) fixed;
+         font-family:'EB Garamond', Georgia, serif; font-size:15.5px; }
+  /* gold frame around the collection page; steps aside for the deck panel */
+  body::after { content:""; position:fixed; inset:0; pointer-events:none; z-index:18;
+                border:3px solid var(--accent);
+                box-shadow:inset 0 0 14px -6px var(--accent);
+                transition:right .28s ease; }
+  body.building::after { right:360px; }
+  /* masthead */
+  #masthead { display:flex; align-items:center; justify-content:center; gap:22px;
+              padding:16px 20px 12px; color:var(--accent);
+              border-bottom:1px solid var(--line);
+              background:linear-gradient(180deg, rgba(200,162,74,.07), transparent 70%);
+              box-shadow:inset 0 6px 14px -10px var(--accent); }
+  #masthead .fl { width:150px; height:24px; opacity:.85; flex:none; }
+  #masthead .ttl { text-align:center; }
+  #masthead h1 { font-family:'Arkhamic', serif; font-weight:400; margin:0;
+                 font-size:34px; letter-spacing:2px; color:var(--accent2);
+                 text-shadow:0 2px 10px rgba(200,162,74,.35); }
+  #masthead .sub { font-style:italic; color:var(--dim); font-size:14px; letter-spacing:3px;
+                   text-transform:uppercase; margin-top:2px; }
+  /* filter bar */
+  header { background:linear-gradient(180deg, var(--panel), rgba(28,28,36,.97));
+           border-bottom:1px solid var(--line); padding:10px 16px;
+           display:block; box-shadow:0 6px 16px -8px #000; }
+  header .frow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:4px 0; }
+  header input#q { width:250px; background:var(--bg); border:1px solid var(--line);
+                   border-radius:5px; font-family:inherit; font-size:14px; }
+  header input#q:focus { outline:none; border-color:var(--accent); }
+  .chiprow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .sep { width:14px; }
+  .chip { --c:var(--accent); font-family:inherit; font-size:13.5px; cursor:pointer;
+          background:transparent; color:var(--c); border:1px solid var(--c);
+          border-radius:14px; padding:3px 12px; line-height:1.35; transition:all .12s; }
+  .chip:hover { box-shadow:0 0 8px -2px var(--c); }
+  .chip.on { background:var(--c); color:#14141a; font-weight:700;
+             box-shadow:0 0 10px -2px var(--c); }
+  .chip.gold { --c:var(--accent); }
+  .chip.dim { --c:#6e6a60; }
+  #count { color:var(--dim); margin-left:auto; font-style:italic; }
+  #btnDecks { font-weight:700; }
+  #btnDocs { font-weight:700; margin-left:auto; }
+  /* docs panel: same slide-out slot as the deck panel */
+  #docspanel { position:fixed; top:0; right:0; bottom:0; width:var(--bw);
+               background:linear-gradient(180deg, var(--panel), var(--bg));
+               border:2px solid var(--accent);
+               box-shadow:-8px 0 22px -14px var(--accent), inset 0 0 16px -10px var(--accent);
+               z-index:15; overflow-y:auto; padding:12px; font-size:13px;
+               transform:translateX(105%); transition:transform .28s ease; }
+  body.docsopen #docspanel { transform:translateX(0); }
+  body.docsopen #masthead, body.docsopen header, body.docsopen #grid, body.docsopen #more {
+    margin-right:var(--bw); }
+  body.docsopen::after { right:var(--bw); }
+  body.docsopen #bgrip { display:block; }
+  #docspanel .dochead { text-align:center; margin:-12px -12px 10px; padding:12px 8px 9px;
+    border-bottom:1px solid var(--accent); color:var(--accent);
+    background:linear-gradient(180deg, rgba(200,162,74,.10), transparent); }
+  #docspanel .dochead h2 { font-family:'Arkhamic', serif; font-weight:400; margin:0;
+    font-size:24px; letter-spacing:2px; color:var(--accent2);
+    text-shadow:0 2px 8px rgba(200,162,74,.4); }
+  #docspanel .dochead .sub { font-style:italic; color:var(--dim); font-size:12px;
+    letter-spacing:2.5px; text-transform:uppercase; }
+  #docspanel .docgroup { margin-bottom:10px; background:rgba(0,0,0,.28);
+    border:1px solid color-mix(in srgb, var(--dc, var(--accent)) 55%, var(--line));
+    border-radius:16px; padding:8px 12px 10px;
+    box-shadow:0 0 10px -3px color-mix(in srgb, var(--dc, var(--accent)) 30%, transparent); }
+  #docspanel .docgroup .gt { font-family:'Arkhamic', serif; letter-spacing:1px;
+    font-size:16px; color:var(--dc, var(--accent2)); margin:2px 0 4px; }
+  #docspanel a.doc { display:block; color:var(--text); text-decoration:none;
+    padding:3px 6px; border-radius:8px; }
+  #docspanel a.doc:hover { background:rgba(200,162,74,.12); color:var(--accent2); }
+  #docspanel a.doc::before { content:"\1F4C4  "; }
+  #count { margin-left:auto; }
+  .frow #q { margin-left:8px; }
+  /* deck panel hero */
+  .bhero { text-align:center; margin:-12px -12px 10px; padding:12px 8px 9px;
+           border-bottom:1px solid var(--pc, var(--arcane));
+           background:linear-gradient(180deg,
+             color-mix(in srgb, var(--pc, var(--arcane)) 12%, transparent), transparent);
+           color:var(--pc, var(--arcane)); }
+  .bhero h2 { font-family:'Arkhamic', serif; font-weight:400; margin:0;
+              font-size:24px; letter-spacing:2px; color:var(--accent2);
+              text-shadow:0 2px 8px rgba(65,168,160,.4); }
+  .bhero .fl { width:110px; height:16px; opacity:.8; }
+  .bhero .sub { font-style:italic; color:var(--dim); font-size:12px;
+                letter-spacing:2.5px; text-transform:uppercase; }
+  /* drawer */
+  #drawer { border-top:1px solid var(--line); margin-top:8px; padding:8px 2px 4px;
+            max-height:45vh; overflow-y:auto; }
+  #drawer .dgroup { margin-bottom:10px; background:rgba(0,0,0,.28);
+                    border:1px solid var(--line); border-radius:16px;
+                    padding:8px 12px 10px; }
+  #drawer .dtitle { font-family:'Arkhamic', serif; color:var(--accent); font-size:17px;
+                    letter-spacing:1px; margin:2px 0 6px; }
+  #drawer .chip { font-size:12.5px; padding:2px 10px; margin:2px 3px 2px 0; }
+  /* grid & cards */
+  #grid { padding:16px; gap:12px; }
+  .card { background:var(--panel); border-radius:8px;
+          border:1px solid color-mix(in srgb, var(--c, var(--accent)) 40%, var(--line));
+          transition:transform .12s, box-shadow .12s;
+          box-shadow:0 0 12px 0 color-mix(in srgb, var(--c, var(--accent)) 30%, transparent); }
+  .card:hover { transform:translateY(-3px);
+          box-shadow:0 8px 18px -6px #000, 0 0 16px 1px color-mix(in srgb, var(--c, var(--accent)) 55%, transparent); }
+  .card .cap { border-left:3px solid var(--c, var(--accent)); font-family:inherit;
+               font-size:13px; padding:5px 8px; background:var(--panel2); }
+  .card .addbar { background:var(--panel2); }
+  #more { font-family:'Arkhamic', serif; font-size:16px; letter-spacing:1px;
+          border:1px solid var(--accent); color:var(--accent); border-radius:6px;
+          background:transparent; padding:8px 28px; }
+  #more:hover { background:var(--accent); color:#14141a; }
+  /* section headers */
+  .sechead h2 { font-family:'Arkhamic', serif; font-weight:400; color:var(--accent2);
+                letter-spacing:1px; font-size:22px; }
+  .sethead { font-family:'Arkhamic', serif; letter-spacing:1px; font-size:16px;
+             border-bottom:1px solid var(--line); }
+  /* detail overlay */
+  #overlay { background:rgba(8,8,12,.85); backdrop-filter:blur(2px); }
+  #detail { background:var(--panel); border-radius:10px;
+            border:1px solid color-mix(in srgb, var(--c, var(--accent)) 65%, var(--line));
+            box-shadow:0 0 44px -8px color-mix(in srgb, var(--c, var(--accent)) 60%, transparent); }
+  #detail img { border:1px solid color-mix(in srgb, var(--c, var(--accent)) 45%, var(--line));
+                box-shadow:0 0 18px 0 color-mix(in srgb, var(--c, var(--accent)) 40%, transparent); }
+  #detail h2 { font-family:'Arkhamic', serif; font-weight:400; color:var(--accent2); letter-spacing:1px; }
+  #detail h3 { font-style:italic; }
+  #detail .text { font-size:15px; }
+  /* builder */
+  :root { --arcane:#41a8a0; --bw:360px; }
+  #builder { width:var(--bw); }
+  body.building #masthead, body.building header, body.building #grid, body.building #more {
+    margin-right:var(--bw); }
+  body.building::after { right:var(--bw); }
+  #bgrip { display:none; position:fixed; top:0; bottom:0; right:var(--bw);
+           width:12px; margin-right:-6px; cursor:col-resize; z-index:19; }
+  #bgrip:hover { background:linear-gradient(90deg, transparent, rgba(65,168,160,.35), transparent); }
+  body.building #bgrip { display:block; }
+  body.resizing #builder, body.resizing #masthead, body.resizing header,
+  body.resizing #grid, body.resizing #more { transition:none !important; }
+  body.resizing::after { transition:none !important; }
+  #builder { background:linear-gradient(180deg, var(--panel), var(--bg));
+             border:2px solid var(--pc, var(--arcane));
+             box-shadow:-8px 0 22px -14px var(--pc, var(--arcane)),
+                        inset 0 0 16px -10px var(--pc, var(--arcane));
+             display:block; transform:translateX(105%);
+             transition:transform .28s ease, border-color .3s, box-shadow .3s; }
+  body.building #builder { transform:translateX(0); }
+  #masthead, header, #grid, #more { transition:margin-right .28s ease; }
+  #builder h2 { font-family:'Arkhamic', serif; font-weight:400; color:var(--accent2); letter-spacing:1px; }
+  #builder h3 { font-family:'Arkhamic', serif; font-weight:400; letter-spacing:1px; font-size:15px; }
+  #builder button { font-family:inherit; border-radius:12px; }
+  #builder button.primary { border-color:var(--accent); color:var(--accent); }
+  #builder button.primary:hover { background:var(--accent); color:#14141a; }
+  #builder input, #builder select, #builder textarea { font-family:inherit; }
+  #builder h2 input { font-family:inherit; font-size:16px; width:100%; }
+  #toast { font-family:inherit; box-shadow:0 6px 20px -6px #000; }
+  body.building #masthead { margin-right:360px; }
+  /* labeled chip groups */
+  .cgroup { display:inline-flex; align-items:center; gap:8px; padding:3px 12px 3px 10px;
+            border:1px solid var(--line); border-radius:18px;
+            background:rgba(0,0,0,.18); }
+  .glabel { font-variant:small-caps; letter-spacing:2px; color:var(--accent);
+            font-size:12.5px; opacity:.85; user-select:none; }
+  /* upgrade path */
+  .wishline { display:flex; align-items:center; gap:6px; padding:2px 4px; border-radius:5px;
+              border:1px solid transparent; }
+  .wishline .nm { flex:1; cursor:pointer; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .wishline .nm:hover { color:var(--accent); }
+  .wishline .cost { color:var(--dim); min-width:44px; text-align:right; }
+  .wishline.ready { border-color:var(--accent); background:rgba(200,162,74,.10);
+                    box-shadow:0 0 8px -3px var(--accent); }
+  .wishline.ready .cost { color:var(--accent2); font-weight:700; }
+  .wishline button { padding:0 7px; margin:0; }
+  .wishline .wlink { max-width:110px; font-size:11px; padding:1px 2px; color:var(--dim); }
+  .readybadge { color:var(--accent2); font-size:12px; border:1px solid var(--accent);
+                border-radius:10px; padding:0 7px; }
+  .pdfbtn { color:var(--accent); border:1px solid var(--accent); border-radius:12px;
+            padding:2px 10px; text-decoration:none; font-size:12.5px; margin-left:6px; }
+  .pdfbtn:hover { background:var(--accent); color:#14141a; }
+  /* class icons (inline svg) */
+  .clsdot { width:14px; height:14px; flex:none; display:inline-flex;
+            filter:drop-shadow(0 0 3px var(--c)); }
+  .clsdot svg { width:100%; height:100%; }
+  svg.cicon { width:14px; height:14px; vertical-align:-2px; margin-right:5px; }
+  svg.hicon { width:15px; height:15px; vertical-align:middle; }
+  /* analysis histograms: white axes on black */
+  .histgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0; }
+  .histgrid .hist { margin:0; min-width:0; }
+  .hist { background:#050507; border:1px solid var(--line); border-radius:12px;
+          padding:8px 10px 6px; margin:8px 0; }
+  .hist .htitle { font-variant:small-caps; letter-spacing:2px; font-size:12px;
+                  color:var(--accent); margin-bottom:4px; }
+  .hbars { display:flex; align-items:flex-end; gap:5px; height:92px;
+           border-bottom:1.5px solid #fff;
+           padding:2px 6px 0; }
+  .hbar { flex:1; display:flex; flex-direction:column; justify-content:flex-end;
+          align-items:center; height:100%; min-width:0; }
+  .hbar .bv { font-size:10px; color:#fff; line-height:1.2; }
+  .hbar .bar { width:68%; background:var(--c); border-radius:2px 2px 0 0;
+               box-shadow:0 0 8px -2px var(--c); min-height:1px; }
+  .hlabels { display:flex; gap:5px; padding:3px 6px 0 8px; }
+  .hlab { flex:1; text-align:center; font-size:10px; color:#fff; opacity:.85;
+          overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+  .decknotes { width:100%; min-height:74px; resize:vertical; border-radius:10px;
+               background:rgba(0,0,0,.25); line-height:1.45; }
+  /* how-to accordion */
+  .howto details { margin:4px 0; border:1px solid var(--line); border-radius:12px;
+                   background:rgba(0,0,0,.22); overflow:hidden; }
+  .howto summary { cursor:pointer; padding:7px 12px; color:var(--accent);
+                   font-size:13.5px; list-style:none; }
+  .howto summary::-webkit-details-marker { display:none; }
+  .howto summary::before { content:"\25B8  "; }
+  .howto details[open] summary::before { content:"\25BE  "; }
+  .howto details[open] summary { border-bottom:1px solid var(--line); }
+  .howto .hbody { padding:8px 12px 10px; font-size:13px; line-height:1.5; color:var(--text); }
+  /* campaign art, investigator card, stats */
+  .boxart { width:100%; border-radius:8px; margin:4px 0 8px; border:1px solid var(--line);
+            box-shadow:0 4px 14px -6px #000; }
+  .invcard { width:100%; border-radius:8px; margin:2px 0 6px; cursor:pointer;
+             border:1px solid color-mix(in srgb, var(--dc, var(--accent)) 55%, var(--line));
+             box-shadow:0 4px 14px -6px #000,
+                        0 0 16px 0 color-mix(in srgb, var(--dc, var(--accent)) 40%, transparent); }
+  .invcard:hover { box-shadow:0 0 18px 0 color-mix(in srgb, var(--dc, var(--accent)) 65%, transparent); }
+  .statrow { display:flex; gap:8px; margin:6px 0; }
+  .stat { flex:1; text-align:center; border:1px solid var(--line); border-radius:8px;
+          padding:6px 2px 4px; background:rgba(0,0,0,.18); }
+  .stat .sv { font-family:'Arkhamic', serif; font-size:22px; color:var(--accent2); }
+  .stat .sl { font-variant:small-caps; letter-spacing:2px; font-size:11px; color:var(--dim); }
+  .tp { color:#ff7a66; } .tm { color:#c08cff; }
+  .stat .sv.warn, .sv.warn { color:#e88; }
+  .logcell input { width:34px; padding:2px 2px; font-size:11.5px; }
+  #builder td.logcell { padding:2px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div id="masthead">
+  <svg class="fl" viewBox="0 0 140 24" aria-hidden="true">
+    <path d="M2 12 H44 M36 12 C45 3 58 3 67 12 C58 21 45 21 36 12 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="67" cy="12" r="2.6" fill="currentColor"/>
+    <path d="M67 12 C76 3 89 3 98 12 C89 21 76 21 67 12 Z M90 12 H138" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  </svg>
+  <div class="ttl">
+    <h1>Arkham Horror</h1>
+    <div class="sub">Living Card Game &middot; Collection Library</div>
+  </div>
+  <svg class="fl" viewBox="0 0 140 24" aria-hidden="true">
+    <path d="M2 12 H44 M36 12 C45 3 58 3 67 12 C58 21 45 21 36 12 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="67" cy="12" r="2.6" fill="currentColor"/>
+    <path d="M67 12 C76 3 89 3 98 12 C89 21 76 21 67 12 Z M90 12 H138" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  </svg>
+</div>
+<header>
+  <div class="frow">
+    <span class="cgroup"><span class="glabel">Scope</span><span id="scopeChips" class="chiprow"></span></span>
+    <button class="chip gold" id="btnProducts">Products &#9662;</button>
+    <button class="chip gold" id="btnScenarios">Scenarios &#9662;</button>
+    <button class="chip gold" id="btnESets">Encounter Sets &#9662;</button>
+    <button class="chip dim" id="btnClear">Clear</button>
+    <span id="count"></span>
+    <input id="q" type="search" placeholder="Search name, text, traits&hellip;">
+  </div>
+  <div class="frow">
+    <span class="cgroup"><span class="glabel">Class</span><span id="classChips" class="chiprow"></span></span>
+    <button class="chip gold" id="btnDocs">Docs</button>
+    <button class="chip gold" id="btnDecks">Decks</button>
+  </div>
+  <div class="frow">
+    <span class="cgroup"><span class="glabel">Type</span><span id="typeChips" class="chiprow"></span></span>
+    <span class="cgroup"><span class="glabel">XP</span><span id="xpChips" class="chiprow"></span></span>
+  </div>
+  <div id="drawer" style="display:none"></div>
+</header>
+<div id="builder"></div>
+<div id="docspanel"></div>
+<div id="bgrip" title="drag to resize"></div>
+<div id="toast"></div>
+<div id="grid"></div>
+<button id="more">Show more</button>
+<div id="overlay"><div id="detail"></div></div>
+<script src="data/catalog.js"></script>
+<script src="data/cards.js"></script>
+<script src="data/scenarios.js"></script>
+<script src="data/icons.js"></script>
+<script src="data/docs.js"></script>
+<script>
+"use strict";
+const PLAYER_TYPES = new Set(["investigator","asset","event","skill"]);
+const $ = id => document.getElementById(id);
+const grid = $("grid"), overlay = $("overlay"), detail = $("detail");
+const PAGE = 120;
+let filtered = [], shown = 0;
+
+function scopeOf(c) {
+  return (PLAYER_TYPES.has(c.type_code) && !c.encounter_name) ? "player" : "encounter";
+}
+function classOf(c) {
+  if (c.faction2_code) return "multi";
+  return c.faction_code || "neutral";
+}
+const CARD_BY_CODE = {};
+for (const c of AHLCG_CARDS) CARD_BY_CODE[c.code] = c;
+const DECK_TYPES = new Set(["enemy","treachery"]);
+
+const PAL = { guardian:"#5cb8ff", seeker:"#f2b64c", rogue:"#4cd97a", mystic:"#c08cff",
+              survivor:"#ff7a66", neutral:"#b8b5ad", multi:"#e8d44c", mythos:"#9ce89c" };
+const FS = { q:"", classes:new Set(), types:new Set(), xps:new Set(),
+             scope:"", products:new Set(), scenario:null, esets:new Set() };
+// encounter sets grouped by product, in collection order
+const ESET_GROUPS = (() => {
+  const g = {};
+  for (const c of AHLCG_CARDS) {
+    if (!c.encounter_code) continue;
+    const grp = g[c.product] = g[c.product] || {};
+    const e = grp[c.encounter_code] = grp[c.encounter_code] ||
+      { code: c.encounter_code, name: c.encounter_name || c.encounter_code, n: 0 };
+    e.n++;
+  }
+  return g;
+})();
+let drawerKind = null;
+
+function chip(label, color, isOn, onClick, title, icon) {
+  const b = document.createElement("button");
+  b.className = "chip" + (isOn ? " on" : "");
+  if (color) b.style.setProperty("--c", color);
+  if (icon) b.insertAdjacentHTML("beforeend", iconSVG(icon, "currentColor"));
+  b.appendChild(document.createTextNode(label));
+  if (title) b.title = title;
+  b.addEventListener("click", onClick);
+  return b;
+}
+const CLASS_ICONS = new Set(["guardian","seeker","rogue","mystic","survivor","neutral","multi"]);
+function classIcon(cl) { return CLASS_ICONS.has(cl) ? cl : "neutral"; }
+// inline SVG icon, colorable via fill (works everywhere, incl. file://)
+function iconSVG(name, color, cls) {
+  const ic = AHLCG_ICONS[name];
+  if (!ic) return "";
+  return `<svg class="${cls || "cicon"}" viewBox="${ic.vb}" style="fill:${color}"
+    xmlns="http://www.w3.org/2000/svg">${ic.d.map(d => `<path d="${d}"/>`).join("")}</svg>`;
+}
+function toggleSet(set, v) { set.has(v) ? set.delete(v) : set.add(v); }
+
+function buildChips() {
+  const cc = $("classChips"); cc.innerHTML = "";
+  for (const cl of ["guardian","seeker","rogue","mystic","survivor","neutral","multi","mythos"])
+    cc.appendChild(chip(cl, PAL[cl], FS.classes.has(cl), () => {
+      toggleSet(FS.classes, cl); FS.scenario = null; buildChips(); apply(); },
+      null, CLASS_ICONS.has(cl) ? cl : null));
+  const TYPE_ORDER = ["investigator","asset","event","skill","enemy","treachery",
+                      "location","act","agenda","scenario","story","key"];
+  const present = new Set(AHLCG_CARDS.map(c => c.type_code));
+  const types = TYPE_ORDER.filter(t => present.has(t))
+    .concat([...present].filter(t => !TYPE_ORDER.includes(t)).sort());
+  const tc = $("typeChips"); tc.innerHTML = "";
+  for (const t of types)
+    tc.appendChild(chip(t, null, FS.types.has(t), () => {
+      toggleSet(FS.types, t); FS.scenario = null; buildChips(); apply(); }));
+  const xc = $("xpChips"); xc.innerHTML = "";
+  for (const x of ["0","1","2","3","4","5"])
+    xc.appendChild(chip("XP " + x, null, FS.xps.has(x), () => {
+      toggleSet(FS.xps, x); FS.scenario = null; buildChips(); apply(); }));
+  const sc = $("scopeChips"); sc.innerHTML = "";
+  for (const [v, label] of [["player","Player"],["encounter","Encounter"]])
+    sc.appendChild(chip(label, null, FS.scope === v, () => {
+      FS.scope = FS.scope === v ? "" : v; FS.scenario = null; buildChips(); apply(); }));
+  $("btnProducts").classList.toggle("on", FS.products.size > 0);
+  $("btnScenarios").classList.toggle("on", FS.scenario != null);
+  $("btnESets").classList.toggle("on", FS.esets.size > 0);
+  if (drawerKind) renderDrawer();
+}
+
+const PRODUCT_GROUPS = (() => {
+  // group owned products by their data/catalog.js group, in catalog order
+  const all = new Set(AHLCG_CARDS.map(c => c.product));
+  const g = {};
+  for (const d of (typeof AHLCG_CATALOG !== "undefined" ? AHLCG_CATALOG : []))
+    if (all.has(d.name)) {
+      (g[d.group] = g[d.group] || []).push(d.name);
+      all.delete(d.name);
+    }
+  if (all.size) g["Other"] = [...all];   // products missing from the catalog
+  return g;
+})();
+
+function renderDrawer() {
+  const d = $("drawer");
+  d.style.display = "block"; d.innerHTML = "";
+  if (drawerKind === "products") {
+    for (const [title, items] of Object.entries(PRODUCT_GROUPS)) {
+      const grp = document.createElement("div"); grp.className = "dgroup";
+      grp.innerHTML = `<div class="dtitle">${title}</div>`;
+      for (const p of items)
+        grp.appendChild(chip(p, null, FS.products.has(p), () => {
+          toggleSet(FS.products, p); FS.scenario = null; buildChips(); apply(); }));
+      d.appendChild(grp);
+    }
+  } else if (drawerKind === "esets") {
+    for (const [product, sets] of Object.entries(ESET_GROUPS)) {
+      const grp = document.createElement("div"); grp.className = "dgroup";
+      grp.innerHTML = `<div class="dtitle">${product}</div>`;
+      for (const e of Object.values(sets))
+        grp.appendChild(chip(`${e.name} (${e.n})`, null, FS.esets.has(e.code), () => {
+          toggleSet(FS.esets, e.code); FS.scenario = null; buildChips(); apply(); }));
+      d.appendChild(grp);
+    }
+  } else if (drawerKind === "scenarios") {
+    const byCamp = {};
+    AHLCG_SCENARIOS.forEach((s, i) => (byCamp[s.campaign] = byCamp[s.campaign] || []).push([s, i]));
+    for (const [camp, list] of Object.entries(byCamp)) {
+      const grp = document.createElement("div"); grp.className = "dgroup";
+      grp.innerHTML = `<div class="dtitle">${camp}</div>`;
+      for (const [s, i] of list)
+        grp.appendChild(chip(s.header ? `${s.header}: ${s.name}` : s.name, null,
+          FS.scenario === i, () => {
+            FS.scenario = FS.scenario === i ? null : i;
+            drawerKind = null; $("drawer").style.display = "none";
+            buildChips(); apply(); }, s.full_name || s.name));
+      d.appendChild(grp);
+    }
+  }
+}
+function toggleDrawer(kind) {
+  drawerKind = drawerKind === kind ? null : kind;
+  if (!drawerKind) $("drawer").style.display = "none";
+  else renderDrawer();
+}
+function clearFilters() {
+  FS.q = ""; $("q").value = "";
+  FS.classes.clear(); FS.types.clear(); FS.xps.clear(); FS.products.clear();
+  FS.esets.clear(); FS.scope = ""; FS.scenario = null;
+  drawerKind = null; $("drawer").style.display = "none";
+  buildChips(); apply();
+}
+
+function init() {
+  buildChips();
+  $("btnProducts").addEventListener("click", () => toggleDrawer("products"));
+  $("btnScenarios").addEventListener("click", () => toggleDrawer("scenarios"));
+  $("btnESets").addEventListener("click", () => toggleDrawer("esets"));
+  $("btnClear").addEventListener("click", clearFilters);
+  $("q").addEventListener("input", () => {
+    FS.q = $("q").value; FS.scenario = null;
+    clearTimeout(window._t); window._t = setTimeout(apply, 150);
+  });
+  $("more").addEventListener("click", () => render(false));
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.style.display = "none"; });
+  addEventListener("keydown", e => { if (e.key === "Escape") overlay.style.display = "none"; });
+  apply();
+}
+function apply() {
+  if (FS.scenario != null) {
+    renderScenario(AHLCG_SCENARIOS[FS.scenario]);
+    return;
+  }
+  const q = FS.q.trim().toLowerCase();
+  filtered = AHLCG_CARDS.filter(c =>
+    (!FS.classes.size || FS.classes.has(classOf(c))) &&
+    (!FS.types.size || FS.types.has(c.type_code)) &&
+    (!FS.xps.size || FS.xps.has(String(c.xp ?? ""))) &&
+    (!FS.products.size || FS.products.has(c.product)) &&
+    (!FS.esets.size || FS.esets.has(c.encounter_code)) &&
+    (!FS.scope || scopeOf(c) === FS.scope) &&
+    (!q || (c.name + " " + (c.subname||"") + " " + (c.traits||"") + " " +
+            (c.text||"") + " " + (c.encounter_name||""))
+      .toLowerCase().includes(q)));
+  // deck-edit mode: only show cards that could legally go into (or be planned
+  // for) the open deck — no encounter cards, other investigators' signatures, etc.
+  if (typeof BSTATE !== "undefined" && BSTATE.open && BSTATE.view === "deck" &&
+      !BSTATE.picking && typeof curDeck === "function" && curDeck()) {
+    const deck = curDeck(), dset = setOfDeck(deck.id);
+    filtered = filtered.filter(c =>
+      DL.checkAdd(c.code, 1, { ...deck, slots: { ...deck.slots, [c.code]: 0 } },
+                  dset, B.decks, { skipCopies: true }).ok);
+  }
+  filtered.sort((a, b) => a.name.localeCompare(b.name) ||
+    (a.xp ?? 0) - (b.xp ?? 0) || a.code.localeCompare(b.code));
+  $("count").textContent = filtered.length + " cards";
+  shown = 0; grid.innerHTML = ""; render(true);
+}
+function cardTile(c, mode) {
+  const d = document.createElement("div");
+  d.className = "card";
+  d.style.setProperty("--c", PAL[classOf(c)] || "#c8a24a");
+  d.innerHTML = c.imagesrc
+    ? `<img loading="lazy" src="images/${c.code}.jpg" alt="">`
+    : `<div class="noimg">${c.name}</div>`;
+  const cap = document.createElement("div");
+  cap.className = "cap";
+  cap.innerHTML = mode === "scenario"
+    ? `<b>${c.name}</b> &middot; ${c.type_code} &times;${c.quantity}`
+    : `<b>${c.name}</b>${c.xp ? " ("+c.xp+")" : ""} &middot; <span class="cls-${classOf(c)}">${classOf(c)}</span>`;
+  d.appendChild(cap);
+  d.addEventListener("click", () => show(c));
+  if (typeof builderDecorateTile === "function") builderDecorateTile(d, c);
+  return d;
+}
+function section(title, note) {
+  const d = document.createElement("div");
+  d.className = "sechead";
+  d.innerHTML = `<h2>${title}</h2>${note ? `<div class="note">${note}</div>` : ""}`;
+  return d;
+}
+function renderScenario(s) {
+  grid.innerHTML = ""; shown = 0; filtered = [];
+  $("more").style.display = "none";
+  const deckSets = [], setupSets = [];
+  let deckCount = 0, total = 0;
+  for (const st of s.sets) {
+    const cards = st.cards.map(k => CARD_BY_CODE[k]).filter(Boolean);
+    const deck = cards.filter(c => DECK_TYPES.has(c.type_code));
+    const setup = cards.filter(c => !DECK_TYPES.has(c.type_code));
+    total += cards.reduce((n,c) => n + c.quantity, 0);
+    deckCount += deck.reduce((n,c) => n + c.quantity, 0);
+    if (deck.length) deckSets.push([st, deck]);
+    if (setup.length) setupSets.push([st, setup]);
+  }
+  $("count").textContent = `${s.sets.length} sets, ${total} cards`;
+  grid.appendChild(section(`${s.campaign} — ${s.full_name || s.name}`,
+    "Encounter sets to gather: " + s.sets.map(st => st.name).join(", ")));
+  grid.appendChild(section(`Encounter deck — enemies &amp; treacheries (${deckCount} cards)`,
+    "Some uniques may be set aside during setup; check the campaign guide."));
+  for (const [st, cards] of deckSets) {
+    const h = document.createElement("div");
+    h.className = "sethead"; h.textContent = st.name;
+    grid.appendChild(h);
+    for (const c of cards) grid.appendChild(cardTile(c, "scenario"));
+  }
+  grid.appendChild(section("Setup / set-aside — locations, acts, agendas, story"));
+  for (const [st, cards] of setupSets) {
+    const h = document.createElement("div");
+    h.className = "sethead"; h.textContent = st.name;
+    grid.appendChild(h);
+    for (const c of cards) grid.appendChild(cardTile(c, "scenario"));
+  }
+}
+function render(reset) {
+  const frag = document.createDocumentFragment();
+  const end = Math.min(shown + PAGE, filtered.length);
+  for (let i = shown; i < end; i++) frag.appendChild(cardTile(filtered[i]));
+  shown = end;
+  grid.appendChild(frag);
+  $("more").style.display = shown < filtered.length ? "block" : "none";
+}
+function stat(label, v) { return v == null ? "" : `${label} ${v} &nbsp; `; }
+// escape HTML, then re-enable ArkhamDB's safe markup (<b>, <i>, …, [[Trait]])
+function cardText(t) {
+  return (t || "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/&lt;(\/?(?:b|i|em|strong|u|br|sub|sup))&gt;/gi, "<$1>")
+    .replace(/\[\[([^\]]+)\]\]/g, "<i><b>$1</b></i>");
+}
+function show(c) {
+  detail.style.setProperty("--c", PAL[classOf(c)] || "#c8a24a");
+  const icons = ["willpower","intellect","combat","agility","wild"]
+    .map(s => ({s, n: c["skill_"+s]})).filter(x => x.n)
+    .map(x => `${x.n}×${x.s}`).join(" ");
+  detail.innerHTML = `
+    ${c.imagesrc ? `<img src="images/${c.code}.jpg" alt="">` : ""}
+    ${c.backimagesrc ? `<img src="images/${c.code}b.jpg" alt="">` : ""}
+    <div class="info">
+      <h2>${c.is_unique ? "&#10022; " : ""}${c.name}${c.xp ? ` (${c.xp})` : ""}</h2>
+      <h3>${c.subname || ""}</h3>
+      <div class="meta">
+        <span class="cls-${classOf(c)}">${classOf(c)}</span> &middot; ${c.type_code}
+        ${c.traits ? " &middot; " + c.traits : ""}
+      </div>
+      <div class="meta">
+        ${stat("Cost:", c.cost)}${stat("Health:", c.health)}${stat("Sanity:", c.sanity)}
+        ${stat("Fight:", c.enemy_fight)}${stat("Evade:", c.enemy_evade)}
+        ${stat("Dmg:", c.enemy_damage)}${stat("Horror:", c.enemy_horror)}
+        ${stat("Shroud:", c.shroud)}${stat("Clues:", c.clues)}${stat("Victory:", c.victory)}
+        ${icons}
+      </div>
+      <div class="text">${cardText(c.text)}</div>
+      <div class="prov">
+        ${c.product} &middot; ${c.pack_name} #${c.position}
+        ${c.encounter_name ? " &middot; " + c.encounter_name : ""}
+        &middot; &times;${c.quantity}<br>
+        <a href="${c.url}" target="_blank" rel="noopener">View on ArkhamDB</a>
+      </div>
+    </div>`;
+  overlay.style.display = "flex";
+}
+init();
+</script>
+<script>
+/* ===== Deckbuilder: pure logic (no DOM) ===== */
+"use strict";
+const DL = (() => {
+  const byCode = {};
+  for (const c of AHLCG_CARDS) byCode[c.code] = c;
+
+  // reprints: canonical code = original printing. ArkhamDB links some via
+  // duplicate_of/alternate_of; Revised Core uses original code + 500.
+  const canon = code => {
+    const c = byCode[code];
+    if (!c) return code;
+    if (c.duplicate_of || c.alternate_of) return c.duplicate_of || c.alternate_of;
+    if (c.pack_code === "rcore") return String(+code - 500).padStart(5, "0");
+    return code;
+  };
+  const canonToOwned = {};   // canonical code -> owned card
+  for (const c of AHLCG_CARDS)
+    if (!canonToOwned[canon(c.code)]) canonToOwned[canon(c.code)] = c;
+  const sameCard = (a, b) => a === b || canon(a) === canon(b);
+
+  // physical pool: identical cards across products share (name, xp, text)
+  const poolKeyOf = c => (c.real_name || c.name) + "|" + (c.xp ?? 0) + "|" +
+    (c.text || "").length;
+  const poolOwned = {};   // poolKey -> total physical copies
+  const poolCodes = {};   // poolKey -> [codes]
+  for (const c of AHLCG_CARDS) {
+    const k = poolKeyOf(c);
+    poolOwned[k] = (poolOwned[k] || 0) + (c.quantity || 0);
+    (poolCodes[k] = poolCodes[k] || []).push(c.code);
+  }
+
+  const lvl = c => c.xp == null ? 0 : c.xp;
+  const isWeakness = c => c.subtype_code === "weakness" || c.subtype_code === "basicweakness";
+  const factionsOf = c => [c.faction_code, c.faction2_code, c.faction3_code].filter(Boolean);
+  const traitsOf = c => (c.traits || "").toLowerCase().split(".").map(s => s.trim()).filter(Boolean);
+
+  function matchOpt(c, o, deck) {
+    if (o.faction && o.faction.length &&
+        !o.faction.some(f => factionsOf(c).includes(f))) return false;
+    if (o.faction_select) {
+      const chosen = deck.choices["fs_" + (o.id || "0")];
+      if (!chosen || !factionsOf(c).includes(chosen)) return false;
+    }
+    if (o.level) { const l = lvl(c); if (l < o.level.min || l > o.level.max) return false; }
+    if (o.base_level) { const l = lvl(c); if (l < o.base_level.min || l > o.base_level.max) return false; }
+    if (o.type && o.type.length && !o.type.includes(c.type_code)) return false;
+    if (o.trait && o.trait.length) {
+      const ts = traitsOf(c);
+      if (!o.trait.some(t => ts.includes(t.toLowerCase()))) return false;
+    }
+    if (o.tag && o.tag.length) {
+      const tags = (c.tags || "").split(".").map(s => s.trim());
+      if (!o.tag.some(t => tags.includes(t))) return false;
+    }
+    if (o.uses && o.uses.length) {
+      const txt = c.text || "";
+      if (!o.uses.some(u => new RegExp("uses\\s*\\([^)]*" + u, "i").test(txt))) return false;
+    }
+    if (o.text && o.text.length) {
+      const txt = c.text || "";
+      if (!o.text.some(rx => new RegExp(rx, "i").test(txt))) return false;
+    }
+    if (o.permanent !== undefined && !!c.permanent !== !!o.permanent) return false;
+    return true;
+  }
+
+  function optionSummary(o) {
+    const parts = [];
+    if (o.faction && o.faction.length) parts.push(o.faction.join("/"));
+    if (o.faction_select) parts.push("chosen class");
+    if (o.trait && o.trait.length) parts.push(o.trait.join("/") + " cards");
+    if (o.type && o.type.length) parts.push(o.type.join("/"));
+    if (o.tag && o.tag.length) parts.push("tag:" + o.tag.join("/"));
+    if (o.level) parts.push(`level ${o.level.min}–${o.level.max}`);
+    if (o.limit) parts.push(`limit ${o.limit}`);
+    return parts.join(" ");
+  }
+
+  // active plain (unlimited) options incl. chosen option_select branch
+  function activeOptions(inv, deck) {
+    const plain = [], limited = [], nots = [];
+    for (const o of inv.deck_options || []) {
+      if (o.not) { nots.push(o); continue; }
+      if (o.deck_size_select) continue;
+      if (o.option_select) {
+        const sel = o.option_select.find(s => s.id === deck.choices.option);
+        if (sel) (sel.limit ? limited : plain).push(sel);
+        continue;
+      }
+      if (o.atleast) { plain.push(o); continue; }   // validation elsewhere
+      (o.limit ? limited : plain).push(o);
+    }
+    return { plain, limited, nots };
+  }
+
+  // copies of pool used across the whole deck set
+  function poolUsed(poolKey, set, decks, exceptDeck, exceptCode) {
+    let n = 0;
+    for (const id of set ? set.decks : []) {
+      const d = decks[id];
+      if (!d) continue;
+      for (const [code, q] of Object.entries(d.slots)) {
+        if (exceptDeck && d.id === exceptDeck && code === exceptCode) continue;
+        if (poolCodes[poolKey] && poolCodes[poolKey].includes(code)) n += q;
+      }
+    }
+    return n;
+  }
+
+  function titleCount(deck, name, exceptCode) {
+    let n = 0;
+    for (const [code, q] of Object.entries(deck.slots)) {
+      if (code === exceptCode) continue;
+      const c = byCode[code];
+      if (c && (c.real_name || c.name) === name) n += q;
+    }
+    return n;
+  }
+
+  // can `deck` hold `newQty` copies of card `code`? (checks ALL rules;
+  // opts.skipCopies bypasses title-limit/ownership for upgrade-path planning)
+  function checkAdd(code, newQty, deck, set, decks, opts = {}) {
+    const c = byCode[code];
+    if (!c) return { ok: false, reason: "unknown card" };
+    const inv = byCode[deck.inv];
+    if (c.type_code === "investigator")
+      return { ok: false, reason: "investigators are not deck cards" };
+    if (c.encounter_code && !isWeakness(c))
+      return { ok: false, reason: "encounter card — not a player card" };
+    if (c.bonded_to)
+      return { ok: false, reason: `bonded to ${c.bonded_to} — added automatically with it` };
+    if (c.restrictions) {
+      if (c.restrictions.investigator) {
+        const allowed = Object.keys(c.restrictions.investigator)
+          .concat(Object.values(c.restrictions.investigator));
+        if (!allowed.some(a => sameCard(a, deck.inv))) {
+          const ownerCode = Object.keys(c.restrictions.investigator)[0];
+          const owner = byCode[ownerCode] || canonToOwned[ownerCode];
+          return { ok: false, reason: `signature card of ${owner ? owner.name : "another investigator"}` };
+        }
+      }
+      if (c.restrictions.faction && inv) {
+        const allowed = Object.keys(c.restrictions.faction);
+        if (!allowed.some(f => factionsOf(inv).includes(f)))
+          return { ok: false, reason: `${allowed.join("/")} investigator only` };
+      }
+      if (c.restrictions.trait && inv) {
+        const its = traitsOf(inv);
+        if (!c.restrictions.trait.some(t => its.includes(t.toLowerCase())))
+          return { ok: false, reason: `requires a ${c.restrictions.trait.join(" or ")} investigator` };
+      }
+    }
+    if (!opts.skipCopies) {
+      // copies by title
+      const name = c.real_name || c.name;
+      const limit = c.myriad ? 3 : (c.deck_limit != null ? c.deck_limit : 2);
+      if (titleCount(deck, name, code) + newQty > limit)
+        return { ok: false, reason: c.exceptional
+          ? "exceptional — 1 copy max"
+          : `deck limit: ${limit} cop${limit === 1 ? "y" : "ies"} by title` };
+      // physical ownership across the deck set
+      const pk = poolKeyOf(c);
+      const owned = poolOwned[pk] || 0;
+      const used = poolUsed(pk, set, decks, deck.id, code);
+      if (used + newQty > owned)
+        return { ok: false, reason: `you own ${owned} cop${owned === 1 ? "y" : "ies"}; ${used} already in use in this deck set` };
+    }
+    // weaknesses skip class rules
+    if (isWeakness(c)) return { ok: true };
+    if (!inv || !inv.deck_options) return { ok: true };
+    const { plain, limited, nots } = activeOptions(inv, deck);
+    for (const o of nots)
+      if (matchOpt(c, o, deck))
+        return { ok: false, reason: o.error || "excluded by investigator deckbuilding rules" };
+    if (plain.some(o => matchOpt(c, o, deck))) return { ok: true };
+    for (const o of limited) {
+      if (!matchOpt(c, o, deck)) continue;
+      let usage = 0;   // deck cards that need this limited option
+      for (const [sc, q] of Object.entries(deck.slots)) {
+        if (sc === code) continue;
+        const scd = byCode[sc];
+        if (!scd || isWeakness(scd) ||
+            (scd.restrictions && scd.restrictions.investigator)) continue;
+        if (matchOpt(scd, o, deck) && !plain.some(p => matchOpt(scd, p, deck))) usage += q;
+      }
+      if (usage + newQty <= o.limit) return { ok: true };
+      return { ok: false, reason: o.error || `${optionSummary(o)}: limit ${o.limit} reached` };
+    }
+    const pool = (inv.deck_options || []).filter(o => !o.not && !o.deck_size_select)
+      .map(optionSummary).filter(Boolean).join("; ");
+    return { ok: false, reason: `not in ${inv.name}'s card pool (${pool})` };
+  }
+
+  function deckSize(deck) {
+    let n = 0;
+    for (const [code, q] of Object.entries(deck.slots)) {
+      const c = byCode[code];
+      if (!c || c.permanent || isWeakness(c) || c.bonded_to ||
+          (c.restrictions && c.restrictions.investigator)) continue;
+      n += q;
+    }
+    return n;
+  }
+
+  function requiredSize(deck) {
+    const inv = byCode[deck.inv];
+    if (!inv || !inv.deck_requirements) return 30;
+    if (deck.choices.size) return +deck.choices.size;
+    return inv.deck_requirements.size || 30;
+  }
+
+  function deckXP(deck) {
+    let xp = 0;
+    const myriadPaid = new Set();
+    for (const [code, q] of Object.entries(deck.slots)) {
+      const c = byCode[code];
+      if (!c || isWeakness(c)) continue;
+      const eff = lvl(c) * (c.exceptional ? 2 : 1);
+      if (c.myriad) {
+        const name = c.real_name || c.name;
+        if (!myriadPaid.has(name)) { xp += eff; myriadPaid.add(name); }
+      } else xp += eff * q;
+    }
+    return xp;
+  }
+
+  // XP to buy one copy of `code` into `deck` now: level (exceptional doubled),
+  // minus the highest lower-level same-title copy already in the deck; min 1
+  function wishCost(deck, code) {
+    const c = byCode[code];
+    if (!c) return 0;
+    const eff = lvl(c) * (c.exceptional ? 2 : 1);
+    let lower = -1;
+    for (const [sc, q] of Object.entries(deck.slots)) {
+      const d2 = byCode[sc];
+      if (d2 && q > 0 && (d2.real_name || d2.name) === (c.real_name || c.name) &&
+          lvl(d2) < lvl(c)) lower = Math.max(lower, lvl(d2));
+    }
+    return Math.max(1, lower >= 0 ? eff - lower : eff);
+  }
+
+  // itemized cost of changing oldSlots -> newSlots (standard upgrade rules)
+  function upgradeCost(oldSlots, newSlots) {
+    const items = [];
+    const names = {};
+    const collect = (slots, key) => {
+      for (const [code, q] of Object.entries(slots)) {
+        const c = byCode[code];
+        if (!c || isWeakness(c)) continue;
+        const nm = c.real_name || c.name;
+        names[nm] = names[nm] || { old: [], nu: [] };
+        for (let i = 0; i < q; i++) names[nm][key].push(c);
+      }
+    };
+    collect(oldSlots, "old"); collect(newSlots, "nu");
+    for (const [nm, g] of Object.entries(names)) {
+      const oldL = g.old.map(lvl).sort((a,b)=>b-a);
+      const added = [];
+      const oldPool = [...oldL];
+      for (const c of g.nu.sort((a,b)=>lvl(b)-lvl(a))) {
+        const idx = oldPool.indexOf(lvl(c));
+        if (idx >= 0) { oldPool.splice(idx, 1); continue; }   // unchanged copy
+        added.push(c);
+      }
+      const myriadCharged = new Set();
+      for (const c of added) {
+        const exc = c.exceptional ? 2 : 1;
+        let cost;
+        if (c.myriad && myriadCharged.has(nm)) cost = 0;
+        else {
+          // pair with a lower-level discarded copy of the same title if any
+          const lower = oldPool.filter(l => l < lvl(c)).sort((a,b)=>b-a)[0];
+          if (lower !== undefined) {
+            oldPool.splice(oldPool.indexOf(lower), 1);
+            cost = Math.max(1, lvl(c) * exc - lower);
+          } else cost = Math.max(1, lvl(c) * exc);
+          if (c.myriad) myriadCharged.add(nm);
+        }
+        items.push({ code: c.code, name: nm, xp: lvl(c), cost });
+      }
+    }
+    return items;
+  }
+
+  function validate(deck, set, decks) {
+    const inv = byCode[deck.inv];
+    const warns = [];
+    const size = deckSize(deck), req = requiredSize(deck);
+    if (size !== req) warns.push(`deck size ${size}/${req}`);
+    // required random basic weaknesses
+    const reqRand = ((inv && inv.deck_requirements && inv.deck_requirements.random) || []).length;
+    let basics = 0;
+    for (const [code, q] of Object.entries(deck.slots)) {
+      const c = byCode[code];
+      if (c && c.subtype_code === "basicweakness") basics += q;
+    }
+    if (basics < reqRand) warns.push(`needs ${reqRand} random basic weakness${reqRand>1?"es":""} (has ${basics})`);
+    // signatures present?
+    for (const [reqCode, alts] of Object.entries((inv && inv.deck_requirements && inv.deck_requirements.card) || {})) {
+      const wanted = [reqCode, ...Object.keys(alts || {})];
+      const have = Object.keys(deck.slots).some(sc => wanted.some(w => sameCard(w, sc)));
+      if (!have) {
+        const c = byCode[reqCode] || canonToOwned[reqCode];
+        warns.push(`missing signature: ${c ? c.name : reqCode}`);
+      }
+    }
+    // atleast (e.g. Lola, 5U-21)
+    for (const o of (inv && inv.deck_options) || []) {
+      if (!o.atleast || !o.atleast.factions) continue;
+      const perFaction = {};
+      for (const [code, q] of Object.entries(deck.slots)) {
+        const c = byCode[code];
+        if (!c || isWeakness(c)) continue;
+        for (const f of factionsOf(c)) perFaction[f] = (perFaction[f] || 0) + q;
+      }
+      const enough = Object.values(perFaction).filter(n => n >= o.atleast.min).length;
+      if (enough < o.atleast.factions)
+        warns.push(o.error || `needs ≥${o.atleast.min} cards in each of ${o.atleast.factions} factions`);
+    }
+    // every slot still legal (choices may have changed)
+    for (const [code, q] of Object.entries(deck.slots)) {
+      const probe = { ...deck, slots: { ...deck.slots, [code]: 0 } };
+      const r = checkAdd(code, q, probe, set, decks);
+      if (!r.ok) warns.push(`${byCode[code] ? byCode[code].name : code}: ${r.reason}`);
+    }
+    return warns;
+  }
+
+  return { byCode, poolKeyOf, poolOwned, poolCodes, lvl, isWeakness,
+           checkAdd, deckSize, requiredSize, deckXP, upgradeCost, validate,
+           activeOptions, matchOpt, canon, canonToOwned, sameCard, wishCost };
+})();
+</script>
+<script>
+/* ===== Deckbuilder: UI ===== */
+"use strict";
+const LSKEY = "ahlcg_builder_v1";
+let B = loadB();
+let BSTATE = { open: false, view: "home", setId: null, deckId: null,
+               picking: false, upgradeFrom: null };
+
+function loadB() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(LSKEY)); } catch (e) {}
+  if (!d || !d.sets) d = { sets: {}, decks: {}, seq: 1 };
+  // display order for deck sets (object key order is numeric, not insertion)
+  d.setOrder = (d.setOrder || []).filter(id => d.sets[id]);
+  for (const id of Object.keys(d.sets))
+    if (!d.setOrder.includes(id)) d.setOrder.push(id);
+  return d;
+}
+function saveB() { try { localStorage.setItem(LSKEY, JSON.stringify(B)); } catch (e) {} }
+function nid() { return String(B.seq++); }
+function esc(s) { return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"); }
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg; t.style.display = "block";
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => t.style.display = "none", 4000);
+}
+function curSet() { return B.sets[BSTATE.setId] || null; }
+function curDeck() { return B.decks[BSTATE.deckId] || null; }
+function setOfDeck(deckId) {
+  return Object.values(B.sets).find(s => s.decks.includes(deckId)) || null;
+}
+// chronological campaign order, taken from the release order in AHLCG_SCENARIOS
+const CAMPAIGN_RANK = (() => {
+  const r = {}; let i = 0;
+  for (const s of AHLCG_SCENARIOS) if (!(s.campaign in r)) r[s.campaign] = i++;
+  return r;
+})();
+function setSortKey(s) {
+  return s.campaign ? (CAMPAIGN_RANK[s.campaign] ?? 9998) : -1;
+}
+// distinct color per campaign, keyed to its box art
+const CAMPAIGN_COLOR = {
+  "The Night of the Zealot": "#5a8a6a",      // ghoulish green-teal
+  "Brethren of Ash": "#e06a3c",              // ember orange
+  "The Dunwich Legacy": "#b08a5a",           // sepia farmhouse
+  "The Path to Carcosa": "#e8d44c",          // the Yellow Sign
+  "The Forgotten Age": "#4cae5c",            // jungle green
+  "The Circle Undone": "#7a8fd0",            // spectral blue-violet
+  "The Dream-Quest": "#d08cc8",              // dreamlands rose
+  "The Web of Dreams": "#9a6ad8",            // nightmare violet
+  "The Innsmouth Conspiracy": "#3fa8a0",     // deep-one teal
+  "Edge of the Earth": "#a8d8e8",            // antarctic ice
+  "The Scarlet Keys": "#d84a5a",             // scarlet
+  "The Feast of Hemlock Vale": "#8ab04a",    // hemlock green
+  "The Drowned City": "#4a90c0",             // drowned blue
+};
+const CAMPAIGN_GUIDE = {
+  "The Night of the Zealot": "notz", "The Dunwich Legacy": "dwl",
+  "The Path to Carcosa": "ptc", "The Forgotten Age": "tfa",
+  "The Circle Undone": "tcu", "The Dream-Quest": "tde_a",
+  "The Web of Dreams": "tde_b", "The Innsmouth Conspiracy": "tic",
+  "Edge of the Earth": "eoe", "The Scarlet Keys": "tsk",
+  "The Feast of Hemlock Vale": "fhv", "The Drowned City": "tdc",
+  "Brethren of Ash": "boa",
+};
+const CAMPAIGN_ART = {
+  "The Night of the Zealot": "core", "Brethren of Ash": "core_ch2",
+  "The Dunwich Legacy": "dwl", "The Path to Carcosa": "ptc",
+  "The Forgotten Age": "tfa", "The Circle Undone": "tcu",
+  "The Dream-Quest": "tde", "The Web of Dreams": "tde",
+  "The Innsmouth Conspiracy": "tic", "Edge of the Earth": "eoe",
+  "The Scarlet Keys": "tsk", "The Feast of Hemlock Vale": "fhv",
+  "The Drowned City": "tdc", "Standalone Scenarios": "side_stories",
+};
+function traumaTotal(set, deckId) {
+  let p = 0, m = 0;
+  for (const e of (set && set.log) || []) {
+    const t = e.trauma && e.trauma[deckId];
+    if (t) { p += +t[0] || 0; m += +t[1] || 0; }
+  }
+  return [p, m];
+}
+function deckXPBalance(deck) {
+  const set = setOfDeck(deck.id);
+  let earned = 0;
+  if (set) for (const e of set.log || []) earned += +(e.xp && e.xp[deck.id]) || 0;
+  let spent = 0;
+  for (const p of deck.purchases || []) spent += p.total;
+  return { earned, spent: spent - (deck.xpAdj || 0), avail: earned - spent + (deck.xpAdj || 0) };
+}
+
+/* ---- tile decoration (browse grid) ---- */
+function builderDecorateTile(tile, c) {
+  if (!BSTATE.open) return;
+  if (BSTATE.picking) {
+    if (c.type_code === "investigator" && !c.encounter_code) {
+      const bar = document.createElement("div");
+      bar.className = "addbar";
+      bar.innerHTML = `<button>Choose investigator</button>`;
+      bar.firstChild.addEventListener("click", e => { e.stopPropagation(); pickInvestigator(c); });
+      tile.appendChild(bar);
+    }
+    return;
+  }
+  const deck = curDeck();
+  if (!deck || BSTATE.view !== "deck") return;
+  const q = deck.slots[c.code] || 0;
+  const w = (deck.wishlist || {})[c.code] || 0;
+  const bar = document.createElement("div");
+  bar.className = "addbar";
+  bar.innerHTML = `<button data-a="sub">&minus;</button><span class="inq">${q}</span><button data-a="add">+</button>` +
+    `<button data-a="plan" title="add to upgrade path">&#9734;${w ? w : ""}</button>`;
+  bar.addEventListener("click", e => {
+    e.stopPropagation();
+    const a = e.target.dataset && e.target.dataset.a;
+    if (a === "add") tryAdd(c, 1);
+    if (a === "sub") tryAdd(c, -1);
+    if (a === "plan") planAdd(c);
+  });
+  tile.appendChild(bar);
+}
+function tryAdd(c, delta) {
+  const deck = curDeck(), set = setOfDeck(deck.id);
+  const cur = deck.slots[c.code] || 0;
+  if (delta > 0) {
+    const r = DL.checkAdd(c.code, cur + delta, { ...deck, slots: { ...deck.slots, [c.code]: 0 } }, set, B.decks);
+    if (!r.ok) { toast(`${c.name}: ${r.reason}`); return; }
+    deck.slots[c.code] = cur + delta;
+  } else {
+    if (cur <= 0) return;
+    if (cur === 1) delete deck.slots[c.code]; else deck.slots[c.code] = cur - 1;
+  }
+  saveB(); renderBuilder(); apply();
+}
+function planAdd(c) {
+  const deck = curDeck(), set = setOfDeck(deck.id);
+  deck.wishlist = deck.wishlist || {};
+  // class-pool legality only; copy/ownership limits don't apply to plans
+  const r = DL.checkAdd(c.code, 1, { ...deck, slots: { ...deck.slots, [c.code]: 0 } },
+                        set, B.decks, { skipCopies: true });
+  if (!r.ok) { toast(`${c.name}: ${r.reason}`); return; }
+  deck.wishlist[c.code] = (deck.wishlist[c.code] || 0) + 1;
+  // auto-link to a lower-level copy of the same title already in the deck
+  deck.wishlinks = deck.wishlinks || {};
+  if (!deck.wishlinks[c.code]) {
+    let best = null;
+    for (const [sc, q] of Object.entries(deck.slots)) {
+      const d2 = DL.byCode[sc];
+      if (d2 && q > 0 && (d2.real_name || d2.name) === (c.real_name || c.name) &&
+          DL.lvl(d2) < DL.lvl(c) && (!best || DL.lvl(d2) > DL.lvl(DL.byCode[best])))
+        best = sc;
+    }
+    if (best) deck.wishlinks[c.code] = best;
+  }
+  toast(`${c.name} added to upgrade path`);
+  saveB(); renderBuilder(); apply();
+}
+// wish cost honoring an explicit replacement link
+function wishCostL(deck, code) {
+  const repl = (deck.wishlinks || {})[code];
+  const c = DL.byCode[code], r = repl && DL.byCode[repl];
+  if (!c || !r || !(deck.slots[repl] > 0)) return DL.wishCost(deck, code);
+  const eff = DL.lvl(c) * (c.exceptional ? 2 : 1);
+  const sameTitle = (r.real_name || r.name) === (c.real_name || c.name);
+  // same title: pay the difference; different card: full cost (removal is free)
+  return Math.max(1, sameTitle ? eff - DL.lvl(r) : eff);
+}
+function readyCount(deck) {
+  const bal = deckXPBalance(deck);
+  let n = 0;
+  for (const [code, q] of Object.entries(deck.wishlist || {}))
+    for (let i = 0; i < q; i++) if (wishCostL(deck, code) <= bal.avail) n++;
+  return n;
+}
+function pickInvestigator(c) {
+  const set = curSet();
+  const deck = { id: nid(), name: c.name, inv: c.code, slots: {},
+                 choices: {}, purchases: [], xpAdj: 0, wishlist: {} };
+  // auto-add signatures (first owned alternative)
+  for (const [reqCode, alts] of Object.entries((c.deck_requirements && c.deck_requirements.card) || {})) {
+    const codes = [reqCode, ...Object.keys(alts || {})];
+    let owned = null;
+    for (const k of codes) owned = owned || DL.byCode[k] || DL.canonToOwned[k];
+    if (owned) deck.slots[owned.code] = owned.quantity || 1;
+  }
+  B.decks[deck.id] = deck;
+  set.decks.push(deck.id);
+  BSTATE.picking = false; BSTATE.deckId = deck.id; BSTATE.view = "deck";
+  saveB(); resetFiltersForDeck(c); renderBuilder(); apply();
+}
+function resetFiltersForDeck(inv) {
+  FS.scenario = null; FS.types.clear(); FS.xps.clear(); FS.products.clear();
+  FS.classes.clear(); FS.scope = "player"; FS.q = ""; $("q").value = "";
+  buildChips();
+}
+
+/* ---- builder panel views ---- */
+const BHERO = `<div class="bhero">
+  <svg class="fl" viewBox="0 0 140 24" aria-hidden="true">
+    <path d="M2 12 H44 M36 12 C45 3 58 3 67 12 C58 21 45 21 36 12 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    <circle cx="67" cy="12" r="2.6" fill="currentColor"/>
+    <path d="M67 12 C76 3 89 3 98 12 C89 21 76 21 67 12 Z M90 12 H138" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  </svg>
+  <h2>Deck Sets</h2>
+  <div class="sub">Decks &middot; Campaigns &middot; Upgrades</div>
+</div>`;
+function renderBuilder() {
+  const el = $("builder");
+  if (!BSTATE.open) return;
+  const ctxSet = BSTATE.view === "home" ? null
+    : (curSet() || (BSTATE.deckId ? setOfDeck(BSTATE.deckId) : null));
+  el.style.setProperty("--pc",
+    (ctxSet && CAMPAIGN_COLOR[ctxSet.campaign]) || "var(--arcane)");
+  if (BSTATE.view === "home") el.innerHTML = BHERO + viewHome();
+  else if (BSTATE.view === "set") el.innerHTML = BHERO + viewSet();
+  else if (BSTATE.view === "deck") el.innerHTML = BHERO + viewDeck();
+  bindBuilder(el);
+}
+function viewHome() {
+  const sets = B.setOrder.map(id => B.sets[id]).filter(Boolean).sort((a, b) =>
+    setSortKey(a) - setSortKey(b) ||
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+  return `${sets.length ? "" : `<div class="dim">A deck set holds 1&ndash;4 decks that share your physical collection, and can be attached to a campaign.</div>`}
+    ${sets.map(s => `<div class="deckline" data-sid="${s.id}" style="--dc:${CAMPAIGN_COLOR[s.campaign] || "var(--accent)"}">
+        <span class="nm" data-nav="set" data-id="${s.id}">${esc(s.name)}</span>
+        <span class="dim">${s.decks.length} deck${s.decks.length!==1?"s":""}${s.campaign ? " &middot; " + esc(s.campaign) : ""}</span>
+        <button class="danger" data-act="delset" data-id="${s.id}" title="delete deck set">&times;</button>
+      </div>`).join("")}
+    <div class="row"><button class="primary" data-act="newset">New deck set</button></div>
+    <h3>Backup</h3>
+    <div class="row"><button data-act="export">Export JSON</button>
+    <button data-act="import">Import JSON</button>
+    <input type="file" id="impfile" accept=".json" multiple style="display:none"></div>`;
+}
+function viewSet() {
+  const s = curSet();
+  if (!s) { BSTATE.view = "home"; return viewHome(); }
+  const campaigns = [...new Set(AHLCG_SCENARIOS.map(x => x.campaign))]
+    .filter(c => c !== "Standalone Scenarios");
+  const scen = AHLCG_SCENARIOS.filter(x => x.campaign === s.campaign);
+  const side = AHLCG_SCENARIOS.filter(x => x.campaign === "Standalone Scenarios");
+  const opt = (x, e) => `<option${x.name===e.scenario?" selected":""}>${esc(x.name)}</option>`;
+  const logRows = (s.log || []).map((e, i) => `<tr>
+      <td><select data-log="${i}" data-f="scenario"><option value=''>—</option>
+        <optgroup label="${esc(s.campaign)}">${scen.map(x => opt(x, e)).join("")}</optgroup>
+        <optgroup label="Standalone (side scenario)">${side.map(x => opt(x, e)).join("")}</optgroup>
+      </select></td>
+      ${s.decks.map(d => {
+        const t = (e.trauma && e.trauma[d]) || [0, 0];
+        return `<td class="logcell">
+          <input type="number" data-log="${i}" data-f="xp" data-d="${d}" value="${(e.xp&&e.xp[d])||0}" title="XP earned">
+          <input type="number" data-log="${i}" data-f="tp" data-d="${d}" value="${t[0]||0}" title="physical trauma" class="tp">
+          <input type="number" data-log="${i}" data-f="tm" data-d="${d}" value="${t[1]||0}" title="mental trauma" class="tm">
+        </td>`; }).join("")}
+      <td><button class="danger" data-act="dellog" data-i="${i}">&times;</button></td>
+    </tr>`).join("");
+  const art = CAMPAIGN_ART[s.campaign];
+  return `<button data-nav="home">&larr; sets</button>
+    <h2><input data-f="setname" value="${esc(s.name)}"></h2>
+    ${art ? `<img class="boxart" src="boxart/${art}.avif" alt="" onerror="this.remove()">` : ""}
+    <div class="row">Campaign:
+      <select data-f="campaign"><option value="">— none —</option>
+      ${campaigns.map(c => `<option${c===s.campaign?" selected":""}>${esc(c)}</option>`).join("")}</select>
+      ${CAMPAIGN_GUIDE[s.campaign] ? `<a class="pdfbtn" href="guides/${CAMPAIGN_GUIDE[s.campaign]}.pdf" target="_blank" rel="noopener" title="open campaign guide">&#128196; Guide</a>` : ""}</div>
+    <h3>Decks (${s.decks.length}/4)</h3>
+    ${s.decks.map(id => {
+      const d = B.decks[id]; if (!d) return "";
+      const inv = DL.byCode[d.inv];
+      const bal = deckXPBalance(d);
+      const rdy = readyCount(d);
+      const [tp, tm] = traumaTotal(s, id);
+      return `<div class="deckline" draggable="true" data-did="${id}" style="--dc:${(inv && PAL[inv.faction_code]) || "var(--accent)"}">
+        <span class="nm" data-nav="deck" data-id="${id}">${esc(d.name)}</span>
+        <span class="dim">${inv ? esc(inv.name) : "?"} &middot; ${s.campaign ? bal.avail + " XP" : DL.deckXP(d) + " XP"}
+          ${tp || tm ? ` &middot; <span class="tp">${tp}P</span>/<span class="tm">${tm}M</span>` : ""}</span>
+        ${rdy ? `<span class="readybadge">${rdy} ready</span>` : ""}
+        <button class="danger" data-act="deldeck" data-id="${id}">&times;</button></div>`;
+    }).join("")}
+    ${s.decks.length < 4 ? `<div class="row"><button class="primary" data-act="newdeck">New deck</button>
+      <button data-act="exportset">Export set</button></div>`
+      : `<div class="row"><button data-act="exportset">Export set</button></div>`}
+    ${s.campaign ? `<h3>Campaign log</h3>
+      <table><tr><th>Scenario</th>${s.decks.map(d =>
+        `<th title="${esc((B.decks[d]||{}).name)}">${esc(((B.decks[d]||{}).name||"?").slice(0,8))}</th>`).join("")}<th></th></tr>
+      ${logRows}</table>
+      <div class="row"><button data-act="addlog">Add scenario entry</button></div>
+      <div class="dim">per deck: XP earned &middot; <span class="tp">physical</span> &middot; <span class="tm">mental</span> trauma</div>` : ""}`;
+}
+/* ---- deck analysis histograms ---- */
+function histHTML(title, entries) {
+  const max = Math.max(1, ...entries.map(e => e.val));
+  return `<div class="hist">
+    <div class="hbars">${entries.map(e => `
+      <div class="hbar"><div class="bv">${e.val || ""}</div>
+        <div class="bar" style="height:${Math.round(e.val / max * 100)}%; --c:${e.color}"></div>
+      </div>`).join("")}</div>
+    <div class="hlabels">${entries.map(e =>
+      `<div class="hlab" title="${esc(e.title || e.label)}">${e.icon
+        ? [].concat(e.icon).map(i => iconSVG(i, e.color, "hicon")).join("")
+        : e.label}</div>`).join("")}</div>
+  </div>`;
+}
+function deckAnalysis(deck) {
+  const cls = {}, icons = { willpower:0, intellect:0, combat:0, agility:0, wild:0 };
+  const cost = { "0":0, "1":0, "2":0, "3":0, "4":0, "5":0, "6+":0 };
+  const slots = {};
+  for (const [code, q] of Object.entries(deck.slots)) {
+    const c = DL.byCode[code];
+    if (!c || c.bonded_to) continue;
+    cls[classOf(c)] = (cls[classOf(c)] || 0) + q;
+    for (const k of Object.keys(icons)) icons[k] += (c["skill_" + k] || 0) * q;
+    if (c.cost != null && c.cost >= 0)
+      cost[c.cost >= 6 ? "6+" : String(c.cost)] += q;
+    if (c.type_code === "asset" && c.slot)
+      slots[c.slot] = (slots[c.slot] || 0) + q;
+  }
+  const CLS_ORDER = ["guardian","seeker","rogue","mystic","survivor","neutral","multi"];
+  const h1 = histHTML("Classes", CLS_ORDER.filter(k => cls[k])
+    .map(k => ({ label: k.slice(0, 3), title: k, val: cls[k], color: PAL[k],
+                 icon: classIcon(k) })));
+  const ICON_COLOR = { willpower:"#7ea6ff", intellect:"#f2b64c", combat:"#ff7a66",
+                       agility:"#4cd97a", wild:"#e8e4d8" };
+  const h2 = histHTML("Skill icons", Object.entries(icons)
+    .map(([k, v]) => ({ label: k.slice(0, 3), title: k, val: v,
+                        color: ICON_COLOR[k], icon: k })));
+  const h3 = histHTML("Resource cost", Object.entries(cost)
+    .map(([k, v]) => ({ label: k, title: "cost " + k, val: v, color: "var(--accent)" })));
+  const SLOT_ICON = { "Hand":"hand", "Hand x2":"hand_x2", "Arcane":"arcane",
+                      "Arcane x2":"arcane_x2", "Ally":"ally", "Body":"body",
+                      "Accessory":"accessory", "Tarot":"tarot" };
+  const slotIcons = k => {
+    const parts = k.split(". ").map(p => SLOT_ICON[p]);
+    return parts.every(Boolean) ? parts : null;
+  };
+  const h4 = histHTML("Asset slots", Object.entries(slots).sort((a, b) => b[1] - a[1])
+    .map(([k, v]) => ({ label: k.replace(" x2", "&times;2").slice(0, 7), title: k,
+                        val: v, color: "#41a8a0", icon: slotIcons(k) })));
+  return `<h3>Analysis</h3><div class="histgrid">${h1}${h2}${h3}${h4}</div>`;
+}
+function viewDeck() {
+  const deck = curDeck();
+  if (!deck) { BSTATE.view = "home"; return viewHome(); }
+  const set = setOfDeck(deck.id);
+  const inv = DL.byCode[deck.inv];
+  if (BSTATE.picking) return `<button data-nav="set" data-id="${set.id}">&larr; ${esc(set.name)}</button>
+    <h2>New deck</h2><div>Click an investigator in the grid to choose it. (Filter is set to Investigators.)</div>`;
+  const size = DL.deckSize(deck), req = DL.requiredSize(deck);
+  const xp = DL.deckXP(deck);
+  const bal = deckXPBalance(deck);
+  const warns = DL.validate(deck, set, B.decks);
+  // choice controls
+  const choiceCtls = [];
+  let fsIdx = 0;
+  for (const o of inv.deck_options || []) {
+    if (o.deck_size_select) choiceCtls.push(`<div class="row">Deck size:
+      <select data-choice="size">${o.deck_size_select.map(v =>
+        `<option${String(deck.choices.size||o.deck_size_select[0])===v?" selected":""}>${v}</option>`).join("")}</select></div>`);
+    if (o.faction_select) {
+      const key = "fs_" + (o.id || "0");
+      choiceCtls.push(`<div class="row">${esc(o.name || "Secondary class")}:
+        <select data-choice="${key}"><option value="">— choose —</option>
+        ${o.faction_select.map(f => `<option${deck.choices[key]===f?" selected":""}>${f}</option>`).join("")}</select></div>`);
+      fsIdx++;
+    }
+    if (o.option_select) choiceCtls.push(`<div class="row">${esc(o.name || "Option")}:
+      <select data-choice="option"><option value="">— choose —</option>
+      ${o.option_select.map(x => `<option value="${x.id}"${deck.choices.option===x.id?" selected":""}>${esc(x.name)}</option>`).join("")}</select></div>`);
+  }
+  // grouped slots
+  const groups = { Assets: [], Events: [], Skills: [], Permanents: [], "Signatures": [], Weaknesses: [], Bonded: [] };
+  for (const [code, q] of Object.entries(deck.slots)) {
+    const c = DL.byCode[code]; if (!c) continue;
+    let g = c.type_code === "asset" ? "Assets" : c.type_code === "event" ? "Events" : c.type_code === "skill" ? "Skills" : "Assets";
+    if (c.permanent) g = "Permanents";
+    if (c.restrictions && c.restrictions.investigator) g = "Signatures";
+    if (DL.isWeakness(c)) g = "Weaknesses";
+    if (c.bonded_to) g = "Bonded";
+    groups[g].push([c, q]);
+  }
+  const slotHTML = Object.entries(groups).filter(([g, l]) => l.length).map(([g, l]) =>
+    `<h3>${g}</h3>` + l.sort((a,b)=>a[0].name.localeCompare(b[0].name)).map(([c, q]) =>
+      `<div class="slotline"><span class="clsdot" title="${classOf(c)}" style="--c:${PAL[classOf(c)] || "#888"}">${iconSVG(classIcon(classOf(c)), PAL[classOf(c)] || "#888")}</span><span class="nm" data-show="${c.code}">${esc(c.name)}${c.xp?` (${c.xp})`:""}</span>
+       <span class="dim">&times;${q}</span>
+       <button data-slot="${c.code}" data-a="sub">&minus;</button>
+       <button data-slot="${c.code}" data-a="add">+</button></div>`).join("")).join("");
+  const upgrade = BSTATE.upgradeFrom ? (() => {
+    const items = DL.upgradeCost(BSTATE.upgradeFrom, deck.slots);
+    const total = items.reduce((n, i) => n + (BSTATE.costOverride[i.code] ?? i.cost), 0);
+    return `<h3>Upgrade in progress</h3>
+      ${items.length ? items.map(i =>
+        `<div class="slotline"><span class="nm">${esc(i.name)}${i.xp?` (${i.xp})`:""}</span>
+         <input type="number" data-cost="${i.code}" value="${BSTATE.costOverride[i.code] ?? i.cost}"></div>`).join("")
+        : `<div class="dim">no new purchases yet</div>`}
+      <div class="row">Total: <b>${total}</b> XP (available: ${bal.avail})
+        ${total > bal.avail ? `<span class="warn">over budget</span>` : ""}</div>
+      <div class="row"><button class="primary" data-act="commit">Commit upgrade</button>
+      <button data-act="cancelupgrade">Cancel</button></div>`;
+  })() : "";
+  const [tp, tm] = traumaTotal(set, deck.id);
+  const hurtP = inv.health != null && tp >= inv.health;
+  const hurtM = inv.sanity != null && tm >= inv.sanity;
+  return `<button data-nav="set" data-id="${set ? set.id : ""}">&larr; ${esc(set ? set.name : "sets")}</button>
+    <h2><input data-f="deckname" value="${esc(deck.name)}"></h2>
+    ${inv.imagesrc ? `<img class="invcard" src="images/${inv.code}.jpg" data-show="${inv.code}" alt=""
+      style="--dc:${PAL[inv.faction_code] || "var(--accent)"}">` : ""}
+    <div class="row"><span class="nm" data-show="${inv.code}">${esc(inv.name)}</span> &middot;
+      <span class="cls-${inv.faction_code}">${inv.faction_code}</span></div>
+    ${set && set.campaign ? `<div class="statrow">
+      <div class="stat"><div class="sv ${bal.avail<0?"warn":""}">${bal.avail}</div><div class="sl">XP</div></div>
+      <div class="stat"><div class="sv tp ${hurtP?"warn":""}">${tp}${inv.health!=null?"/"+inv.health:""}</div><div class="sl">Physical</div></div>
+      <div class="stat"><div class="sv tm ${hurtM?"warn":""}">${tm}${inv.sanity!=null?"/"+inv.sanity:""}</div><div class="sl">Mental</div></div>
+    </div>${hurtP ? `<div class="row warn">physical trauma has reached health — killed</div>` : ""}
+    ${hurtM ? `<div class="row warn">mental trauma has reached sanity — driven insane</div>` : ""}` : ""}
+    ${choiceCtls.join("")}
+    <div class="row">Cards: <b class="${size===req?"ok":"warn"}">${size}/${req}</b> &middot;
+      Deck XP: <b>${xp}</b>${set && set.campaign ? `
+      <button data-act="adjxp" title="manual XP adjustment (Adaptable etc.)">adj: ${deck.xpAdj||0}</button>` : ""}</div>
+    ${warns.length ? `<div class="row warn">${warns.map(esc).join("<br>")}</div>` : `<div class="row ok">deck is legal</div>`}
+    <div class="row">
+      <button data-act="randweak">Draw random basic weakness</button>
+      ${set && set.campaign && !BSTATE.upgradeFrom ? `<button data-act="upgrade">Start upgrade</button>` : ""}
+    </div>
+    ${upgrade}
+    ${(() => {
+      const wl = Object.entries(deck.wishlist || {});
+      if (!wl.length) return "";
+      return `<h3>Upgrade path</h3>` + wl.map(([code, q]) => {
+        const c = DL.byCode[code]; if (!c) return "";
+        const cost = wishCostL(deck, code);
+        const ready = set && set.campaign && cost <= bal.avail;
+        const link = (deck.wishlinks || {})[code] || "";
+        const slotOpts = Object.entries(deck.slots)
+          .filter(([sc, sq]) => sq > 0 && sc !== code && DL.byCode[sc] &&
+                  !DL.isWeakness(DL.byCode[sc]) &&
+                  !(DL.byCode[sc].restrictions && DL.byCode[sc].restrictions.investigator))
+          .map(([sc]) => { const d2 = DL.byCode[sc];
+            return `<option value="${sc}"${sc === link ? " selected" : ""}>${esc(d2.name)}${d2.xp ? ` (${d2.xp})` : ""}</option>`; })
+          .join("");
+        return `<div class="wishline${ready ? " ready" : ""}">
+          <span class="nm" data-show="${code}">${esc(c.name)}${c.xp ? ` (${c.xp})` : ""}${q > 1 ? ` &times;${q}` : ""}</span>
+          <select class="wlink" data-wlink="${code}" title="card this upgrade replaces">
+            <option value="">&#8644; replaces&hellip;</option>${slotOpts}</select>
+          <span class="cost">${cost} XP</span>
+          <button data-act="buywish" data-code="${code}" title="buy into deck (swaps out the linked card)">buy</button>
+          <button class="danger" data-act="delwish" data-code="${code}">&times;</button>
+        </div>`;
+      }).join("") + `<div class="dim">planned purchases &mdash; gold means affordable now; linking a card
+        makes <i>buy</i> swap it out (same title pays the level difference)</div>`;
+    })()}
+    ${slotHTML}
+    <div class="dim row">Add cards from the grid (+/&minus;); &#9734; plans a card for later.</div>
+    <h3>Notes</h3>
+    <textarea class="decknotes" data-f="decknotes" rows="4"
+      placeholder="Build notes &mdash; mulligan priorities, upgrade plans, combos&hellip;">${esc(deck.notes || "")}</textarea>
+    ${deckAnalysis(deck)}
+    <h3>How to use</h3>
+    <div class="howto">
+      <details><summary>Adding / Using XP</summary>
+        <div class="hbody">
+          <b>Earning:</b> go back to the deck set and press <i>Add scenario entry</i> in the
+          campaign log. After each scenario, enter the XP each investigator earned (usually
+          victory display + scenario bonus) in that deck's first column. Available XP shown
+          at the top of this deck = total earned &minus; XP spent on upgrades.<br><br>
+          <b>Spending:</b> press <i>Start upgrade</i>, then add/remove cards with the grid's
+          +/&minus; buttons (or <i>buy</i> from the upgrade path). Costs follow the usual rules:
+          a new card costs its level (minimum 1), upgrading a same-named card costs the level
+          difference, Exceptional cards cost double. Adjust any line's cost before pressing
+          <i>Commit upgrade</i>, which deducts the total.<br><br>
+          <b>Corrections:</b> the <i>adj</i> button applies a manual XP adjustment for effects
+          like Adaptable, Arcane Research, or D&eacute;j&agrave; Vu.
+        </div>
+      </details>
+      <details><summary>Adding Trauma</summary>
+        <div class="hbody">
+          In the deck set's campaign log, each deck has three small boxes per scenario:
+          XP, <span class="tp">physical trauma</span>, and <span class="tm">mental trauma</span>.
+          Enter trauma when the campaign guide inflicts it (defeat by damage = 1 physical,
+          by horror = 1 mental, plus story effects). Running totals appear at the top of the
+          deck next to the investigator's health and sanity; the stat turns red when trauma
+          reaches the limit &mdash; killed or driven insane.
+        </div>
+      </details>
+      <details><summary>Building a legal deck</summary>
+        <div class="hbody">
+          Use the grid's +/&minus; buttons with any filters active. Cards outside the
+          investigator's card pool are blocked with an explanation (class levels, off-class
+          limits, copies you own, copies reserved by other decks in this set). Signature cards
+          were added automatically; press <i>Draw random basic weakness</i> to complete the
+          deck. Some investigators show extra dropdowns here (secondary class, deck size,
+          trait choice) that change what's legal.
+        </div>
+      </details>
+      <details><summary>Upgrade path (planning)</summary>
+        <div class="hbody">
+          The &#9734; button on any card tile adds it to this deck's upgrade path &mdash; a
+          wishlist of future purchases. Each entry shows its XP cost (accounting for a
+          lower-level copy already in the deck). An entry glows gold when your unspent XP
+          covers it, and the set view shows how many upgrades are ready. <i>buy</i> moves it
+          into the deck, starting an upgrade automatically.
+        </div>
+      </details>
+    </div>`;
+}
+function bindBuilder(el) {
+  el.querySelectorAll("[data-nav]").forEach(n => n.addEventListener("click", () => {
+    const v = n.dataset.nav;
+    if (v === "home") { BSTATE.view = "home"; BSTATE.setId = BSTATE.deckId = null; }
+    if (v === "set") { BSTATE.view = "set"; BSTATE.setId = n.dataset.id || BSTATE.setId; BSTATE.deckId = null; BSTATE.picking = false; }
+    if (v === "deck") { BSTATE.view = "deck"; BSTATE.deckId = n.dataset.id; }
+    BSTATE.upgradeFrom = null;
+    renderBuilder(); apply();
+  }));
+  el.querySelectorAll("[data-show]").forEach(n => n.addEventListener("click", e => {
+    if (e.target.dataset.nav) return;
+    show(DL.byCode[n.dataset.show]);
+  }));
+  // deck sets (home view) sort automatically: campaign release order, then name
+  // drag-to-reorder decks within a set
+  el.querySelectorAll(".deckline[data-did]").forEach(row => {
+    row.addEventListener("dragstart", e => {
+      window._dragDeck = row.dataset.did;
+      e.dataTransfer.effectAllowed = "move";
+    });
+    row.addEventListener("dragover", e => { e.preventDefault(); row.classList.add("dragover"); });
+    row.addEventListener("dragleave", () => row.classList.remove("dragover"));
+    row.addEventListener("drop", e => {
+      e.preventDefault();
+      row.classList.remove("dragover");
+      const from = window._dragDeck, to = row.dataset.did;
+      window._dragDeck = null;
+      if (!from || from === to) return;
+      const o = curSet().decks;
+      o.splice(o.indexOf(from), 1);
+      o.splice(o.indexOf(to), 0, from);
+      saveB(); renderBuilder();
+    });
+  });
+  el.querySelectorAll("[data-act]").forEach(n => n.addEventListener("click", () => act(n)));
+  el.querySelectorAll("[data-f]").forEach(n => n.addEventListener("change", () => field(n)));
+  el.querySelectorAll("[data-choice]").forEach(n => n.addEventListener("change", () => {
+    const deck = curDeck();
+    deck.choices[n.dataset.choice] = n.value || undefined;
+    saveB(); renderBuilder(); apply();
+  }));
+  el.querySelectorAll("[data-slot]").forEach(n => n.addEventListener("click", () => {
+    tryAdd(DL.byCode[n.dataset.slot], n.dataset.a === "add" ? 1 : -1);
+  }));
+  el.querySelectorAll("[data-wlink]").forEach(n => n.addEventListener("change", () => {
+    const deck = curDeck();
+    deck.wishlinks = deck.wishlinks || {};
+    if (n.value) deck.wishlinks[n.dataset.wlink] = n.value;
+    else delete deck.wishlinks[n.dataset.wlink];
+    saveB(); renderBuilder();
+  }));
+  el.querySelectorAll("[data-cost]").forEach(n => n.addEventListener("change", () => {
+    BSTATE.costOverride[n.dataset.cost] = +n.value;
+    renderBuilder();
+  }));
+  el.querySelectorAll("[data-log]").forEach(n => n.addEventListener("change", () => {
+    const s = curSet(), e = s.log[+n.dataset.log];
+    if (n.dataset.f === "scenario") e.scenario = n.value;
+    if (n.dataset.f === "xp") { e.xp = e.xp || {}; e.xp[n.dataset.d] = +n.value; }
+    if (n.dataset.f === "tp" || n.dataset.f === "tm") {
+      e.trauma = e.trauma || {};
+      const t = e.trauma[n.dataset.d] = e.trauma[n.dataset.d] || [0, 0];
+      t[n.dataset.f === "tp" ? 0 : 1] = +n.value;
+    }
+    saveB(); renderBuilder();
+  }));
+}
+function act(n) {
+  const a = n.dataset.act;
+  if (a === "newset") {
+    const s = { id: nid(), name: "New deck set", campaign: "", decks: [], log: [] };
+    B.sets[s.id] = s; B.setOrder.push(s.id);
+    BSTATE.view = "set"; BSTATE.setId = s.id;
+  }
+  if (a === "newdeck") { BSTATE.picking = true; BSTATE.view = "deck"; BSTATE.deckId = null;
+    FS.types = new Set(["investigator"]); FS.scope = ""; FS.scenario = null;
+    FS.classes.clear(); FS.q = ""; $("q").value = ""; buildChips(); }
+  if (a === "delset") {
+    const s = B.sets[n.dataset.id];
+    if (!s || !confirm(`Delete deck set "${s.name}" and its ${s.decks.length} deck(s)?`)) return;
+    for (const id of s.decks) delete B.decks[id];
+    delete B.sets[n.dataset.id];
+    B.setOrder = B.setOrder.filter(x => x !== n.dataset.id);
+    if (BSTATE.setId === n.dataset.id) { BSTATE.setId = null; BSTATE.deckId = null; BSTATE.view = "home"; }
+  }
+  if (a === "deldeck") {
+    if (!confirm("Delete this deck?")) return;
+    const s = curSet(); s.decks = s.decks.filter(x => x !== n.dataset.id);
+    delete B.decks[n.dataset.id];
+  }
+  if (a === "addlog") { const s = curSet(); (s.log = s.log || []).push({ scenario: "", xp: {} }); }
+  if (a === "dellog") { curSet().log.splice(+n.dataset.i, 1); }
+  if (a === "randweak") {
+    const deck = curDeck(), set = setOfDeck(deck.id);
+    const pool = [];
+    for (const c of AHLCG_CARDS) {
+      if (c.subtype_code !== "basicweakness" || c.type_code === "investigator") continue;
+      const r = DL.checkAdd(c.code, (deck.slots[c.code] || 0) + 1,
+        { ...deck, slots: { ...deck.slots, [c.code]: 0 } }, set, B.decks);
+      if (r.ok) for (let i = 0; i < c.quantity; i++) pool.push(c);
+    }
+    if (!pool.length) { toast("no basic weaknesses available"); return; }
+    const c = pool[Math.floor(Math.random() * pool.length)];
+    deck.slots[c.code] = (deck.slots[c.code] || 0) + 1;
+    toast("Drew: " + c.name);
+  }
+  if (a === "buywish") {
+    const deck = curDeck(), set = setOfDeck(deck.id);
+    const code = n.dataset.code, c = DL.byCode[code];
+    if (set && set.campaign && !BSTATE.upgradeFrom) {
+      BSTATE.upgradeFrom = JSON.parse(JSON.stringify(deck.slots));
+      BSTATE.costOverride = {};
+      toast("upgrade started");
+    }
+    // swap out the linked card first
+    const repl = (deck.wishlinks || {})[code];
+    const removed = repl && deck.slots[repl] > 0;
+    if (removed) {
+      if (deck.slots[repl] === 1) delete deck.slots[repl]; else deck.slots[repl]--;
+    }
+    const cur = deck.slots[code] || 0;
+    const r = DL.checkAdd(code, cur + 1, { ...deck, slots: { ...deck.slots, [code]: 0 } }, set, B.decks);
+    if (!r.ok) {
+      if (removed) deck.slots[repl] = (deck.slots[repl] || 0) + 1;   // undo swap
+      toast(`${c.name}: ${r.reason}`);
+      return;
+    }
+    deck.slots[code] = cur + 1;
+    if (removed) toast(`${c.name} bought — replaced ${DL.byCode[repl].name}`);
+    if (deck.wishlist[code] > 1) deck.wishlist[code]--;
+    else { delete deck.wishlist[code]; if (deck.wishlinks) delete deck.wishlinks[code]; }
+  }
+  if (a === "delwish") {
+    const deck = curDeck(), code = n.dataset.code;
+    if (deck.wishlist[code] > 1) deck.wishlist[code]--;
+    else { delete deck.wishlist[code]; if (deck.wishlinks) delete deck.wishlinks[code]; }
+  }
+  if (a === "upgrade") { BSTATE.upgradeFrom = JSON.parse(JSON.stringify(curDeck().slots)); BSTATE.costOverride = {}; }
+  if (a === "cancelupgrade") { curDeck().slots = BSTATE.upgradeFrom; BSTATE.upgradeFrom = null; }
+  if (a === "commit") {
+    const deck = curDeck();
+    const items = DL.upgradeCost(BSTATE.upgradeFrom, deck.slots)
+      .map(i => ({ ...i, cost: BSTATE.costOverride[i.code] ?? i.cost }));
+    const total = items.reduce((x, i) => x + i.cost, 0);
+    (deck.purchases = deck.purchases || []).push({ date: new Date().toISOString().slice(0,10), items, total });
+    BSTATE.upgradeFrom = null;
+  }
+  if (a === "adjxp") {
+    const deck = curDeck();
+    const v = prompt("Manual XP adjustment (e.g. -1 per Adaptable swap refund, Arcane Research discounts):", deck.xpAdj || 0);
+    if (v !== null) deck.xpAdj = +v || 0;
+  }
+  if (a === "export") {
+    download("ahlcg_all_decks.json",
+      { format: "ahlcg-all", sets: B.sets, decks: B.decks });
+  }
+  if (a === "exportset") {
+    const s = curSet();
+    const decks = {};
+    for (const id of s.decks) if (B.decks[id]) decks[id] = B.decks[id];
+    const fname = (s.name || "deck_set").replace(/[^\w\- ]+/g, "").trim()
+      .replace(/\s+/g, "_") || "deck_set";
+    download(fname + ".json", { format: "ahlcg-deckset", set: s, decks });
+  }
+  if (a === "import") {
+    const f = $("impfile");
+    f.onchange = async () => {
+      const files = [...f.files];
+      f.value = "";                       // let the same file be picked again later
+      let n = 0, bad = 0;
+      // if a set with the same name exists, offer to replace it (Cancel keeps both)
+      const importSet = (set, decks) => {
+        const dup = Object.values(B.sets).find(s => s.name === set.name);
+        if (dup && confirm(`A deck set named "${dup.name}" already exists.\nOK = replace it, Cancel = keep both.`)) {
+          for (const id of dup.decks || []) delete B.decks[id];
+          delete B.sets[dup.id];
+          if (B.setOrder) B.setOrder = B.setOrder.filter(x => x !== dup.id);
+          if (BSTATE.setId === dup.id) { BSTATE.setId = null; BSTATE.deckId = null; BSTATE.view = "home"; }
+        }
+        mergeSet(set, decks);
+      };
+      for (const file of files) {
+        try {
+          const d = JSON.parse(await file.text());
+          if (d.format === "ahlcg-deckset" && d.set) { importSet(d.set, d.decks || {}); n++; }
+          else if (d.sets) { for (const s of Object.values(d.sets)) { importSet(s, d.decks || {}); n++; } }
+          else throw 0;
+        } catch (e) { bad++; }
+      }
+      if (n) {
+        saveB();
+        BSTATE = { open: true, view: "home", setId: null, deckId: null, picking: false, upgradeFrom: null };
+        renderBuilder();
+      }
+      const msg = n ? `imported ${n} deck set${n !== 1 ? "s" : ""}` : "";
+      const err = bad ? `${bad} invalid file${bad !== 1 ? "s" : ""} skipped` : "";
+      toast([msg, err].filter(Boolean).join(" · ") || "invalid file");
+    };
+    f.click();
+    return;
+  }
+  saveB(); renderBuilder(); apply();
+}
+function download(fname, obj) {
+  const blob = new Blob([JSON.stringify(obj, null, 1)], { type: "application/json" });
+  const u = URL.createObjectURL(blob);
+  const l = document.createElement("a");
+  l.href = u; l.download = fname; l.click();
+  URL.revokeObjectURL(u);
+}
+// merge an imported set + its decks under fresh ids (no collisions possible)
+function mergeSet(set, decks) {
+  const idMap = {};
+  for (const oldId of set.decks || []) {
+    const d = decks[oldId];
+    if (!d) continue;
+    const newId = nid();
+    idMap[oldId] = newId;
+    B.decks[newId] = { ...JSON.parse(JSON.stringify(d)), id: newId };
+  }
+  const s = JSON.parse(JSON.stringify(set));
+  s.id = nid();
+  s.decks = (set.decks || []).map(o => idMap[o]).filter(Boolean);
+  s.log = (s.log || []).map(e => ({
+    ...e,
+    xp: Object.fromEntries(Object.entries(e.xp || {})
+      .filter(([k]) => idMap[k]).map(([k, v]) => [idMap[k], v])),
+    trauma: Object.fromEntries(Object.entries(e.trauma || {})
+      .filter(([k]) => idMap[k]).map(([k, v]) => [idMap[k], v])),
+  }));
+  B.sets[s.id] = s;
+  B.setOrder.push(s.id);
+}
+function field(n) {
+  if (n.dataset.f === "setname") curSet().name = n.value;
+  if (n.dataset.f === "deckname") curDeck().name = n.value;
+  if (n.dataset.f === "campaign") { curSet().campaign = n.value; }
+  if (n.dataset.f === "decknotes") { curDeck().notes = n.value; saveB(); return; }
+  saveB(); renderBuilder();
+}
+/* draggable panel border */
+(() => {
+  const grip = $("bgrip");
+  let dragging = false;
+  const setW = w => {
+    w = Math.max(300, Math.min(Math.round(w), Math.round(innerWidth * 0.7)));
+    document.documentElement.style.setProperty("--bw", w + "px");
+    return w;
+  };
+  const saved = +localStorage.getItem("ahlcg_bw");
+  if (saved) setW(saved);
+  grip.addEventListener("pointerdown", e => {
+    dragging = true;
+    document.body.classList.add("resizing");
+    grip.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  grip.addEventListener("pointermove", e => { if (dragging) setW(innerWidth - e.clientX); });
+  const end = () => {
+    if (!dragging) return;
+    dragging = false;
+    document.body.classList.remove("resizing");
+    localStorage.setItem("ahlcg_bw",
+      parseInt(getComputedStyle(document.documentElement).getPropertyValue("--bw")) || 360);
+  };
+  grip.addEventListener("pointerup", end);
+  grip.addEventListener("pointercancel", end);
+})();
+/* ---- docs panel ---- */
+let docsOpen = false;
+function renderDocs() {
+  const el = $("docspanel");
+  el.innerHTML = `<div class="dochead">
+      <h2>Documents</h2>
+      <div class="sub">Guides &middot; Logs &middot; Rules</div>
+    </div>` +
+    AHLCG_DOCS.map(g => `<div class="docgroup" style="--dc:${CAMPAIGN_COLOR[g.group] || "var(--accent)"}">
+      <div class="gt">${g.group}</div>
+      ${g.docs.map(([title, file]) =>
+        `<a class="doc" href="guides/${file}.pdf" target="_blank" rel="noopener">${title}</a>`).join("")}
+    </div>`).join("");
+}
+function setDocs(open) {
+  docsOpen = open;
+  document.body.classList.toggle("docsopen", docsOpen);
+  $("btnDocs").innerHTML = docsOpen ? "Close &#9656;" : "Docs";
+  if (docsOpen) renderDocs();
+}
+function setDecks(open) {
+  BSTATE.open = open;
+  document.body.classList.toggle("building", BSTATE.open);
+  $("btnDecks").innerHTML = BSTATE.open ? "Close &#9656;" : "Decks";
+  if (BSTATE.open) renderBuilder();
+}
+$("btnDocs").addEventListener("click", () => {
+  if (BSTATE.open) setDecks(false);
+  setDocs(!docsOpen);
+  apply();
+});
+$("btnDecks").addEventListener("click", () => {
+  if (docsOpen) setDocs(false);
+  setDecks(!BSTATE.open);
+  apply();
+});
+</script>
+</body>
+</html>
