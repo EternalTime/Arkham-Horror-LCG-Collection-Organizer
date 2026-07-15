@@ -95,9 +95,10 @@ PARALLELS = {  # free print-and-play, PDFs on FFG's support page
 }
 # ArkhamDB lists pack codes for the repackaged first-six-cycle boxes
 # (dwlp/dwlc etc.) but keeps the cards under the ORIGINAL cycle codes, so
-# these are empty aliases of products already defined above.
+# these are empty aliases of products already defined above. `books` is an
+# empty placeholder pack (novella cards live under their own codes).
 ALIASES = {"dwlp", "dwlc", "ptcp", "ptcc", "tfap", "tfac",
-           "tcup", "tcuc", "tdep", "tdec", "ticp", "ticc"}
+           "tcup", "tcuc", "tdep", "tdec", "ticp", "ticc", "books"}
 
 NOVELLAS = {  # promo investigator cards bundled with the novellas
     "Hour of the Huntress": "hoth",
@@ -165,9 +166,12 @@ def build_defs():
     for name, code in NOVELLAS.items():
         add(name, g, [[code, None]], "promo cards bundled with the novella")
 
-    add("Promotional Cards", "Promos", [["promo", None]],
-        "convention/organized-play promos on ArkhamDB")
-    add("Books (misc promo cards)", "Promos", [["books", None]])
+    # ArkhamDB's `promo` pack holds exactly the Marie Lambeau promo set
+    # (Arkham Nights); its `books` pack is empty - novella cards live under
+    # their own codes above.
+    add("Marie Lambeau Promo (Arkham Nights)", "Promos", [["promo", None]],
+        "3-card promo: Marie Lambeau, Mystifying Song, Baron Samedi - "
+        "not the 2026 Marie Lambeau Pack")
     return defs
 
 

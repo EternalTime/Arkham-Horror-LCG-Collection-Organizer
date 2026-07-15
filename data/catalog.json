@@ -1236,7 +1236,7 @@
   "note": "promo cards bundled with the novella"
  },
  {
-  "name": "Promotional Cards",
+  "name": "Marie Lambeau Promo (Arkham Nights)",
   "group": "Promos",
   "packs": [
    [
@@ -1244,16 +1244,6 @@
     null
    ]
   ],
-  "note": "convention/organized-play promos on ArkhamDB"
- },
- {
-  "name": "Books (misc promo cards)",
-  "group": "Promos",
-  "packs": [
-   [
-    "books",
-    null
-   ]
-  ]
+  "note": "3-card promo: Marie Lambeau, Mystifying Song, Baron Samedi - not the 2026 Marie Lambeau Pack"
  }
 ]
