@@ -84,12 +84,19 @@ build_scenarios). New campaigns need no script changes, but need a
 Keyed by **campaign name as it appears in scenarios.js** (the ArkhamCards
 `campaign.json` name; standalones merge into "Standalone Scenarios"):
 
-- `CAMPAIGN_COLOR` — border/glow color for deck sets and doc groups.
+- `CAMPAIGN_COLOR` — border/glow color for deck sets, scenario panels, doc
+  groups, and the window tint. Extracted from the ARKHAM HORROR logo band on
+  page 1 of each campaign guide PDF (median of the starry rectangle, logo
+  masked, saturation capped / brightness floored for visibility).
+- `SIDE_COLOR` — the same for standalone packs, extracted from their card
+  art (their rulebooks all share one generic starry cover).
 - `CAMPAIGN_GUIDE` — campaign → `guides/<key>.pdf` for the 📄 Guide button.
+- `SIDE_GUIDE` — standalone pack → its `guides/rules_<key>.pdf`, for the
+  per-pack guide buttons on the campaign screen.
 - `CAMPAIGN_ART` — campaign → `boxart/<key>.avif` banner.
 - `CAMPAIGN_CODE` — campaign → arkham-cards-data campaign code (folder name
   under `campaigns/`, the key in `data/campaigns.js`); powers the campaign
-  screen (chaos bag, campaign log, scenario recording).
+  screen (chaos bag, campaign log, story, guided play, scenario recording).
 
 `PRODUCT_GROUPS` (first script block) is generated from the catalog's
 `group` field — no per-product edits needed.
@@ -140,6 +147,7 @@ also need a `SLOT_ICON` entry in `deckAnalysis()`.
 | data/campaigns.js             | generated (build_campaigns.py)          |
 | data/docs.js                  | generated (download_guides.py)          |
 | data/icons.js                 | generated once, committed               |
+| app/ (Rust sources)           | hand-maintained; target/ is build junk  |
 | images/, boxart/, guides/     | downloaded, resumable                   |
 | fonts/, icons/                | static, committed                       |
 | index.html, collection.html   | hand-maintained (the entire app)        |
