@@ -88,7 +88,7 @@ def set_collection(products: list[str]) -> str:
 @mcp.tool()
 def run_pipeline() -> str:
     """Build the whole library from collection.json in one call: cards,
-    images, scenarios, box art, guides. The images step can take a long time
+    images, scenarios, campaigns, box art, guides. The images step can take a long time
     for large collections. Resumable - if it reports unfinished steps, call
     again. Preferred over the individual step tools for setup."""
     return run("setup.py", timeout=7200)
@@ -113,6 +113,14 @@ def build_scenarios() -> str:
     """Build scenario -> encounter set data (data/scenarios.json + .js) from
     the ArkhamCards data project. Run after fetch_cards."""
     return run("build_scenarios.py")
+
+
+@mcp.tool()
+def build_campaigns() -> str:
+    """Build campaign-tracker data (data/campaigns.js: chaos bags per
+    difficulty, campaign-log sections, scenario order + resolutions) from
+    the ArkhamCards data project. Powers the campaign screen."""
+    return run("build_campaigns.py")
 
 
 @mcp.tool()

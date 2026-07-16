@@ -45,7 +45,7 @@ tool — see its header for registration.
 
 ## Layout
 
-    index.html        the whole app: card browser, scenario views, deckbuilder, campaign log
+    index.html        the whole app: card browser, scenario views, deckbuilder, campaign tracker
     collection.html   setup page: mark what you own, export collection.json
     collection.json   your collection (gitignored; created by you)
     data/             catalog (committed) + generated card/scenario databases (gitignored)
@@ -57,8 +57,21 @@ tool — see its header for registration.
 
 ## Notes
 
-- Decks, deck sets, and campaign logs live in your browser's localStorage.
+- Decks, deck sets, and campaign runs live in your browser's localStorage.
   Use the deckbuilder's **Export JSON** for backups; keep them in `decks/`.
+- Attach a campaign to a deck set and hit **Start campaign** (each deck must
+  have drawn its random basic weakness): pick a difficulty to build the
+  chaos bag, then track everything in one ledger — the token-grid chaos bag,
+  campaign log, story text, per-scenario results, and purchased side
+  scenarios (1 XP buys a pack; parts insert at your current position with a
+  shared sub-campaign bag) — all driven by the ArkhamCards campaign data.
+- **Play** on any scenario line walks you through its setup and resolution
+  step by step: branches are asked as questions, chaos-bag and campaign-log
+  effects apply automatically with confirmations, and the finished
+  walkthrough stays readable in the ledger.
+- `app/` holds a thin native macOS shell (Tauri) that serves your clone to
+  a window and autosaves the builder state to `decks/autosave.json` —
+  build instructions in `app/SETUP-APP.md`.
 - The deckbuilder enforces your *physical* pool: two decks in the same deck
   set can't share more copies of a card than you own.
 - Maintenance (new products, data refreshes, special cases): MAINTENANCE.md.

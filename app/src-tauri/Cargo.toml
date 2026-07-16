@@ -1,0 +1,17 @@
+[package]
+name = "ahlcg-app"
+version = "0.1.0"
+description = "AHLCG Collection Organizer - native shell"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tiny_http = "0.12"
+dirs = "5"
+
+[profile.release]
+strip = true
+lto = true

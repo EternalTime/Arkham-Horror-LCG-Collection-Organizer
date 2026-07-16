@@ -52,9 +52,10 @@ they're still tried against the CDN.
 
 ### 4. Scenarios — `scripts/build_scenarios.py`
 
-Data: github.com/zzorba/arkham-cards-data, downloaded to
-`/tmp/arkham-cards-data-master` — **delete that folder to pick up new
-scenario data**; it is not refreshed automatically.
+Data: github.com/zzorba/arkham-cards-data. A local `arkham-cards-data/`
+clone at the repo root takes priority (`git pull` it to update); otherwise
+the repo is downloaded to `/tmp/arkham-cards-data-master` — **delete that
+folder to pick up new scenario data**; it is not refreshed automatically.
 
 - New campaign: add its folder name to `FOLDERS` (inspect the repo's
   `campaigns/` directory; e.g. Brethren of Ash = `boa`).
@@ -65,6 +66,19 @@ scenario data**; it is not refreshed automatically.
   `ALIASES` (e.g. `tekeli_li` → `tekelili`).
 - Scenarios are play-ordered by their encounter set's card positions.
 
+### 4b. Campaigns — `scripts/build_campaigns.py`
+
+Same data source (and local-clone/tarball behavior) as step 4. Extracts,
+per campaign: chaos bags per difficulty, campaign-log sections, scenario
+order; per scenario: resolutions, story text (with "when to read" context
+labels), scenario-level chaos bags, and the full step graph powering the
+guided Play walkthrough (`guideRun`/`applyEffects` in index.html). A
+synthetic `side` entry collects the owned standalone scenarios with XP
+costs and their own bags. Only campaigns in the user's collection are
+included (matched against `data/scenarios.json`, so it runs after
+build_scenarios). New campaigns need no script changes, but need a
+`CAMPAIGN_CODE` entry (step 5).
+
 ### 5. Viewer maps — `index.html`
 
 Keyed by **campaign name as it appears in scenarios.js** (the ArkhamCards
@@ -73,6 +87,9 @@ Keyed by **campaign name as it appears in scenarios.js** (the ArkhamCards
 - `CAMPAIGN_COLOR` — border/glow color for deck sets and doc groups.
 - `CAMPAIGN_GUIDE` — campaign → `guides/<key>.pdf` for the 📄 Guide button.
 - `CAMPAIGN_ART` — campaign → `boxart/<key>.avif` banner.
+- `CAMPAIGN_CODE` — campaign → arkham-cards-data campaign code (folder name
+  under `campaigns/`, the key in `data/campaigns.js`); powers the campaign
+  screen (chaos bag, campaign log, scenario recording).
 
 `PRODUCT_GROUPS` (first script block) is generated from the catalog's
 `group` field — no per-product edits needed.
@@ -120,6 +137,7 @@ also need a `SLOT_ICON` entry in `deckAnalysis()`.
 | data/catalog.js/.json         | generated (build_catalog.py), committed |
 | data/cards.js/.json           | generated (fetch_collection.py)         |
 | data/scenarios.js/.json       | generated (build_scenarios.py)          |
+| data/campaigns.js             | generated (build_campaigns.py)          |
 | data/docs.js                  | generated (download_guides.py)          |
 | data/icons.js                 | generated once, committed               |
 | images/, boxart/, guides/     | downloaded, resumable                   |

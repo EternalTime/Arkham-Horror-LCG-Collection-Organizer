@@ -21,8 +21,8 @@ partial refreshes.
    `mcp/server.py` (stdio; requires `pip install "mcp[cli]"`). It exposes
    `list_catalog`, `build_catalog`, `get_collection`, `set_collection`,
    `run_pipeline` (all of setup in one call), plus per-step tools
-   (`fetch_cards`, `download_images`, `build_scenarios`, `download_boxart`,
-   `download_guides`) and `status`. The tools wrap the scripts below 1:1.
+   (`fetch_cards`, `download_images`, `build_scenarios`, `build_campaigns`,
+   `download_boxart`, `download_guides`) and `status`. The tools wrap the scripts below 1:1.
 2. **Shell**: `python3 scripts/setup.py` runs everything after
    `collection.json` exists; the individual scripts in `scripts/` are the
    same steps (stdlib only, no dependencies).
@@ -49,14 +49,19 @@ partial refreshes.
 4. **Images** — `python3 scripts/download_images.py`. Long (up to ~1.6 GB);
    resumable; rerun until it prints COMPLETE.
 5. **Scenarios** — `python3 scripts/build_scenarios.py` → `data/scenarios.*`.
-   Downloads the ArkhamCards data repo to `/tmp/arkham-cards-data-master`;
-   delete that folder to pick up newer scenario data.
-6. **Box art** — `python3 scripts/download_boxart.py`. Rerun until COMPLETE.
-7. **Guides** — `python3 scripts/download_guides.py`. Downloads official
+   Uses a local `arkham-cards-data/` clone if one exists at the repo root,
+   else downloads the repo to `/tmp/arkham-cards-data-master` (delete that
+   folder to pick up newer scenario data).
+6. **Campaigns** — `python3 scripts/build_campaigns.py` → `data/campaigns.js`
+   (chaos bags per difficulty, campaign-log sections, scenario order and
+   resolutions — powers the campaign screen). Same data source and
+   local-clone/tarball behavior as step 5.
+7. **Box art** — `python3 scripts/download_boxart.py`. Rerun until COMPLETE.
+8. **Guides** — `python3 scripts/download_guides.py`. Downloads official
    rules/campaign PDFs for owned products and regenerates `data/docs.js`
    (the viewer's Docs panel). `--all` fetches everything regardless of
    ownership.
-8. **Verify** — open `index.html` in a browser (no server needed). The
+9. **Verify** — open `index.html` in a browser (no server needed). The
    Products drawer should list exactly the owned products; card images and
    the Docs panel should populate. Or check file counts:
    `data/cards.json` nonempty, `images/*.jpg` ≈ number of cards (plus `b`
@@ -87,8 +92,15 @@ generator doesn't classify it, add it to the appropriate dict in
   the ORIGINAL deluxe + Mythos pack codes; the repackage is exactly the
   player half or encounter half of the cycle. ArkhamDB's `dwlp`/`dwlc`-style
   codes for them are empty aliases — ignore them.
-- Decks, deck sets, and campaign logs live in the browser's localStorage.
+- Decks, deck sets, and campaign runs live in the browser's localStorage.
   The builder's Export JSON is the backup mechanism; keep exports in `decks/`.
+- A deck set's campaign run is `s.run = { code, difficulty, bag, log, notes }`
+  where `code` is the arkham-cards-data campaign code (`CAMPAIGN_CODE` map in
+  index.html), `bag` the current chaos-token list, `log` per-scenario results
+  (`{ sid, scenario, resolution, xp: {deckId: n}, trauma: {deckId: [p, m]} }`)
+  and `notes` free text per campaign-log section. Old exports that kept
+  results in `set.log` are migrated to `run` automatically on load/import.
+  Starting a campaign requires every deck to have its random basic weakness.
 - `index.html` is the entire app (single file, no build step, no server).
   `data/*.js` files are the same data as the `.json` files wrapped in a
   `const`, because `file://` pages can't fetch local JSON.

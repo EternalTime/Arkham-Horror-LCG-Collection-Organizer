@@ -21,6 +21,8 @@ OUT_DIR = Path(__file__).resolve().parent.parent / "data"
 REPO_TGZ = ("https://codeload.github.com/zzorba/arkham-cards-data/"
             "tar.gz/refs/heads/master")
 REPO_DIR = Path("/tmp/arkham-cards-data-master")
+# a local clone takes priority (git pull it to update); tarball is the fallback
+LOCAL_REPO = Path(__file__).resolve().parent.parent / "arkham-cards-data"
 
 # official campaign/scenario folders (z* are fan campaigns)
 FOLDERS = ["notz", "dwl", "ptc", "tfa", "tcu", "tdea", "tdeb", "tic",
@@ -40,12 +42,15 @@ ALIASES = {
 }
 
 
-def ensure_repo():
-    if REPO_DIR.exists():
-        return
-    print("downloading arkham-cards-data...")
-    data = urllib.request.urlopen(REPO_TGZ, timeout=60).read()
-    tarfile.open(fileobj=io.BytesIO(data)).extractall("/tmp")
+def repo_dir():
+    if (LOCAL_REPO / "campaigns").is_dir():
+        print(f"using local clone: {LOCAL_REPO}")
+        return LOCAL_REPO
+    if not REPO_DIR.exists():
+        print("downloading arkham-cards-data...")
+        data = urllib.request.urlopen(REPO_TGZ, timeout=60).read()
+        tarfile.open(fileobj=io.BytesIO(data)).extractall("/tmp")
+    return REPO_DIR
 
 
 def gather_sets(scenario):
@@ -62,7 +67,7 @@ def gather_sets(scenario):
 
 
 def main():
-    ensure_repo()
+    repo = repo_dir()
     cards = json.loads((OUT_DIR / "cards.json").read_text(encoding="utf-8"))
     by_set = {}
     set_names = {}
@@ -82,7 +87,7 @@ def main():
 
     scenarios, skipped, seen_ids = [], [], set()
     for folder in FOLDERS:
-        cdir = REPO_DIR / "campaigns" / folder
+        cdir = repo / "campaigns" / folder
         campaign = STANDALONE if folder in STANDALONE_FOLDERS else json.loads(
             (cdir / "campaign.json").read_text(encoding="utf-8"))["name"]
         folder_scen = []

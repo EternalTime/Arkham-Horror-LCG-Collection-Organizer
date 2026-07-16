@@ -56,6 +56,20 @@ TDC_C = ["The Drowned City Campaign Expansion"]
 # key is the filename in guides/ (<key>.pdf); groups whose names match a
 # campaign get that campaign's color in the Docs panel.
 MANIFEST = [
+    ("Parallel Investigators", [
+        ("par_by_the_book", "By the Book (Roland Banks)", "6f/5b/6f5b617f-f5c6-4b95-a86a-0d3d7c80635e/bythebookinsert.pdf", None),
+        ("par_read_or_die", "Read or Die (Daisy Walker)", "28/54/28547425-6352-43db-a2e7-b2fb99ad37c1/read_or_die_rules_insert_good.pdf", None),
+        ("par_all_or_nothing", "All or Nothing (“Skids” O’Toole)", "f7/f6/f7f6d8d4-7f5a-4066-a3c7-d1cdefcb376b/all_or_nothing_rules_insert.pdf", None),
+        ("par_bad_blood", "Bad Blood (Agnes Baker)", "5f/dc/5fdcad96-faae-44ae-98c7-b2083508b778/bad_blood_rules_insert-good.pdf", None),
+        ("par_red_tide_rising", "Red Tide Rising (Wendy Adams)", "7a/86/7a86ba75-849a-45ba-b1ee-d0a4b760b780/red_tide_rising_rules_insert_v2.pdf", None),
+        ("par_ashcan_pete", "On the Road Again (“Ashcan” Pete)", "37/53/3753a37e-a265-48a1-b4f8-826ee5b0e9cc/ashcan_pete_parallel_investigator_rules.pdf", None),
+        ("par_laid_to_rest", "Laid to Rest (Jim Culver)", "c8/40/c840a302-06f7-4d86-9122-1d636ee9c889/laid_to_rest_rules_insert.pdf", None),
+        ("par_path_of_the_righteous", "Path of the Righteous (Zoey Samaras)", "9f/00/9f0026a5-25b7-4fcd-a6ec-e4798dd93688/zoey_samaras_parallel_investigator_rules.pdf", None),
+        ("par_relics_of_the_past", "Relics of the Past (Monterey Jack)", "19/6f/196fb2a2-9595-4c23-a7d4-de8ebea2a299/relics_of_the_past_rules_insert.pdf", None),
+        ("par_hunting_for_answers", "Hunting for Answers (Rex Murphy)", "a1/05/a1051c95-5c9e-45ac-9d9c-d362b7135c86/rex_murphy_parallel_investigator_rules.pdf", None),
+        ("par_aura_of_faith", "Aura of Faith (Father Mateo)", "c5/10/c510acb5-0838-489c-bdad-0c047dc68ad7/aura_of_faith_insert.pdf", None),
+        ("par_enthralling_encore", "Enthralling Encore (Lola Hayes)", "46/5f/465f7b17-87c4-41b0-bae9-8538aaa646cb/enthralling_encore_rules_insert.pdf", None),
+    ]),
     ("General Reference", [
         ("rulebook_2026", "Rulebook (2026)", "0e/d0/0ed09507-1705-47ed-a630-cd15885cabb0/ahc100_rulebook-web.pdf", CORE_2026),
         ("learn_to_play", "Learn to Play", "dd/78/dd7818fe-0c9a-4a6c-b685-e32ab55b1702/ahc60_learn_to_play_web.pdf", None),

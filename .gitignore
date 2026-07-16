@@ -11,11 +11,18 @@ data/cards.json
 data/cards.js
 data/scenarios.json
 data/scenarios.js
+data/campaigns.js
 data/docs.js
 
 # your decks / campaign exports
 decks/*
 !decks/.gitkeep
+
+# native app build output
+app/src-tauri/target/
+app/src-tauri/gen/
+app/src-tauri/icons/
+app/src-tauri/Cargo.lock
 
 # caches
 scripts/.pack_cache/

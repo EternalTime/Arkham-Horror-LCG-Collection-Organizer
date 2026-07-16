@@ -7,6 +7,7 @@ they report COMPLETE:
   fetch_collection.py   card database from ArkhamDB
   download_images.py    card scans (large; the long step)
   build_scenarios.py    scenario / encounter-set data
+  build_campaigns.py    campaign-tracker data (chaos bags, logs, scenarios)
   download_boxart.py    campaign covers
   download_guides.py    official rules & campaign-guide PDFs + docs.js
 
@@ -27,6 +28,7 @@ STEPS = [
     ("fetch_collection.py", True, 5),
     ("download_images.py", True, 20),
     ("build_scenarios.py", False, 1),
+    ("build_campaigns.py", False, 1),
     ("download_boxart.py", True, 3),
     ("download_guides.py", True, 3),
 ]
