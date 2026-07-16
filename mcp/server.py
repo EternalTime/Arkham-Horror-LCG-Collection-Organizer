@@ -150,6 +150,7 @@ def status() -> str:
         f"collection.json: {'yes' if COLLECTION.exists() else 'MISSING - run set_collection'}",
         f"cards:           {cards or 'MISSING - run fetch_cards'}",
         f"scenarios:       {'yes' if (ROOT / 'data/scenarios.json').exists() else 'MISSING - run build_scenarios'}",
+        f"campaigns:       {'yes' if (ROOT / 'data/campaigns.js').exists() else 'MISSING - run build_campaigns'}",
         f"images:          {count('images', '*.jpg')} files (run download_images until COMPLETE)",
         f"boxart:          {count('boxart', '*.avif')} files",
         f"guides:          {count('guides', '*.pdf')} PDFs",
