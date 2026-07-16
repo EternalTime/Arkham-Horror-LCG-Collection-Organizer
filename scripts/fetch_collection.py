@@ -1,64 +1,51 @@
 #!/usr/bin/env python3
-"""Build a card database of Damian's Arkham Horror LCG collection from ArkhamDB.
+"""Build a card database of your Arkham Horror LCG collection from ArkhamDB.
 
-Fetches every card (player + encounter) for each owned product and writes:
+Reads which products you own from collection.json (repo root; create it with
+collection.html or by hand) and their pack composition from data/catalog.json
+(regenerate with scripts/build_catalog.py). Fetches every card (player +
+encounter) for each owned product and writes:
   cards.json - plain JSON array, one record per card
   cards.js   - same data as `const AHLCG_CARDS = [...]` for local HTML pages
 
-Re-run after buying new packs; edit PRODUCTS below to add them.
+Re-run after buying new packs; re-export collection.json first.
 """
 
 import json
+import sys
 import time
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-OUT_DIR = Path(__file__).resolve().parent.parent / "data"
+ROOT = Path(__file__).resolve().parent.parent
+OUT_DIR = ROOT / "data"
+COLLECTION = ROOT / "collection.json"
+CATALOG = OUT_DIR / "catalog.json"
 API = "https://arkhamdb.com/api/public/cards/{}.json?encounter=1"
 
-# product name -> list of ArkhamDB pack codes containing its cards.
-# The repackaged Investigator/Campaign expansions (Dunwich..Innsmouth) are
-# catalogued on ArkhamDB under the original deluxe + Mythos pack codes.
-PRODUCTS = {
-    # rcore on ArkhamDB holds only the player cards; the Revised Core's
-    # encounter cards are catalogued under the original core pack (filtered
-    # to encounter cards below).
-    "Revised Core Set": ["rcore", "core"],
-    "Core Set (2026)": ["core_2026"],
-    "The Dunwich Legacy": ["dwl", "tmm", "tece", "bota", "uau", "wda", "litas"],
-    "The Path to Carcosa": ["ptc", "eotp", "tuo", "apot", "tpm", "bsr", "dca"],
-    "The Forgotten Age": ["tfa", "tof", "tbb", "hote", "tcoa", "tdoy", "sha"],
-    "The Circle Undone": ["tcu", "tsn", "wos", "fgg", "uad", "icc", "bbt"],
-    "The Dream-Eaters": ["tde", "sfk", "tsh", "dsm", "pnr", "wgd", "woc"],
-    "The Innsmouth Conspiracy": ["tic", "itd", "def", "hhg", "lif", "lod", "itm"],
-    "Edge of the Earth": ["eoep", "eoec"],
-    "The Scarlet Keys": ["tskp", "tskc"],
-    "The Feast of Hemlock Vale": ["fhvp", "fhvc"],
-    "The Drowned City": ["tdcp", "tdcc"],
-    # Standalone scenarios (all except Carnevale of Horrors)
-    "Curse of the Rougarou": ["cotr"],
-    "The Labyrinths of Lunacy": ["lol"],
-    "Guardians of the Abyss": ["guardians"],
-    "Murder at the Excelsior Hotel": ["hotel"],
-    "The Blob That Ate Everything": ["blob"],
-    "War of the Outer Gods": ["wog"],
-    "Machinations Through Time": ["mtt"],
-    "Fortune and Folly": ["fof"],
-    "The Midwinter Gala": ["tmg"],
-    "Film Fatale": ["film_fatale"],
-    # Investigator starter decks
-    "Nathaniel Cho Starter": ["nat"],
-    "Harvey Walters Starter": ["har"],
-    "Winifred Habbamock Starter": ["win"],
-    "Jacqueline Fine Starter": ["jac"],
-    "Stella Clark Starter": ["ste"],
-    # 2026 evergreen investigator packs
-    "Tommy Muldoon Pack": ["tom"],
-    "Carolyn Fern Pack": ["car"],
-    "André Patel Pack": ["and"],
-    "Marie Lambeau Pack": ["mar"],
-    "Miguel de la Cruz Pack": ["mig"],
+
+def load_products():
+    """collection.json + catalog.json -> {product name: [(pack, filter), ...]}"""
+    if not COLLECTION.exists():
+        sys.exit("collection.json not found. Open collection.html in a browser, "
+                 "mark what you own, export, and save the file next to index.html.")
+    if not CATALOG.exists():
+        sys.exit("data/catalog.json not found. Run: python3 scripts/build_catalog.py")
+    owned = json.loads(COLLECTION.read_text(encoding="utf-8"))["products"]
+    catalog = {d["name"]: d["packs"]
+               for d in json.loads(CATALOG.read_text(encoding="utf-8"))}
+    unknown = [p for p in owned if p not in catalog]
+    if unknown:
+        sys.exit(f"collection.json lists products missing from the catalog: {unknown}\n"
+                 "Re-run scripts/build_catalog.py or fix the names.")
+    return {p: [tuple(pk) for pk in catalog[p]] for p in owned}
+
+
+# filter name -> predicate selecting which of a pack's cards the product contains
+FILTERS = {
+    None: lambda c: True,
+    "player": lambda c: not c.get("encounter_code"),
+    "encounter": lambda c: bool(c.get("encounter_code")),
 }
 
 FIELDS = [
@@ -76,12 +63,6 @@ FIELDS = [
     "real_name", "deck_requirements", "deck_options", "restrictions",
     "bonded_to", "bonded_cards", "tags", "duplicate_of", "alternate_of",
 ]
-
-# pack code -> predicate selecting which of its cards count as owned
-PACK_FILTER = {
-    "core": lambda c: bool(c.get("encounter_code")),
-}
-
 
 CACHE = Path(__file__).resolve().parent / ".pack_cache"
 
@@ -106,14 +87,13 @@ def main():
     CACHE.mkdir(exist_ok=True)
     cards = []
     missing = []
-    for product, packs in PRODUCTS.items():
-        for pack in packs:
+    for product, packs in load_products().items():
+        for pack, flt in packs:
             data = fetch(pack)
             if data is None:
                 missing.append(pack)
                 continue
-            keep = PACK_FILTER.get(pack, lambda c: True)
-            data = [c for c in data if keep(c)]
+            data = [c for c in data if FILTERS[flt](c)]
             for c in data:
                 rec = {f: c[f] for f in FIELDS if f in c}
                 rec["product"] = product
