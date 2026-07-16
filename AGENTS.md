@@ -52,10 +52,13 @@ partial refreshes.
    Uses a local `arkham-cards-data/` clone if one exists at the repo root,
    else downloads the repo to `/tmp/arkham-cards-data-master` (delete that
    folder to pick up newer scenario data).
-6. **Campaigns** — `python3 scripts/build_campaigns.py` → `data/campaigns.js`
-   (chaos bags per difficulty, campaign-log sections, scenario order and
-   resolutions — powers the campaign screen). Same data source and
-   local-clone/tarball behavior as step 5.
+6. **Campaigns** — `python3 scripts/build_campaigns.py` → `data/campaigns.js`.
+   Per campaign: chaos bags per difficulty, campaign-log sections, scenario
+   order; per scenario: resolutions, story text with read-when context, and
+   the full step graph that powers the guided Play walkthrough; plus a
+   synthetic `side` entry of owned standalone scenarios (XP costs, own
+   chaos bags). Same data source and local-clone/tarball behavior as
+   step 5; only campaigns in the collection are included.
 7. **Box art** — `python3 scripts/download_boxart.py`. Rerun until COMPLETE.
 8. **Guides** — `python3 scripts/download_guides.py`. Downloads official
    rules/campaign PDFs for owned products and regenerates `data/docs.js`
@@ -94,12 +97,21 @@ generator doesn't classify it, add it to the appropriate dict in
   codes for them are empty aliases — ignore them.
 - Decks, deck sets, and campaign runs live in the browser's localStorage.
   The builder's Export JSON is the backup mechanism; keep exports in `decks/`.
-- A deck set's campaign run is `s.run = { code, difficulty, bag, log, notes }`
+- A deck set's campaign run is
+  `s.run = { code, difficulty, bag, log, notes, side, guide }`
   where `code` is the arkham-cards-data campaign code (`CAMPAIGN_CODE` map in
   index.html), `bag` the current chaos-token list, `log` per-scenario results
   (`{ sid, scenario, resolution, xp: {deckId: n}, trauma: {deckId: [p, m]} }`)
-  and `notes` free text per campaign-log section. Old exports that kept
-  results in `set.log` are migrated to `run` automatically on load/import.
+  `notes` free text per campaign-log section, `side` the purchased side
+  scenarios (`{ sid, name, pos, cost, bag, difficulty }` — pack head holds
+  the shared bag), and `guide` the guided-walkthrough state per scenario
+  (`{ answers, applied, done }`, replayed deterministically). Old exports
+  that kept results in `set.log` are migrated to `run` automatically on
+  load/import.
+- `app/` is an optional native macOS shell (Tauri): serves the clone on
+  localhost, autosaves builder state to `decks/autosave.json`, opens
+  PDFs/links via the system. Build instructions in `app/SETUP-APP.md`;
+  never bundle collection data into it.
   Starting a campaign requires every deck to have its random basic weakness.
 - `index.html` is the entire app (single file, no build step, no server).
   `data/*.js` files are the same data as the `.json` files wrapped in a
