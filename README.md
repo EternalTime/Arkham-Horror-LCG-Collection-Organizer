@@ -48,12 +48,13 @@ tool — see its header for registration.
     index.html        the whole app: card browser, scenario views, deckbuilder, campaign tracker
     collection.html   setup page: mark what you own, export collection.json
     collection.json   your collection (gitignored; created by you)
-    data/             catalog (committed) + generated card/scenario databases (gitignored)
+    data/             catalog (committed) + generated card/scenario/campaign databases (gitignored)
     scripts/          the pipeline, stdlib-only Python
     images/, boxart/, guides/   downloaded content (gitignored)
     fonts/, icons/    static assets, included
-    decks/            your deck exports/backups (gitignored)
+    decks/            your deck exports/backups + the app's autosave (gitignored)
     mcp/              MCP server wrapping the pipeline
+    app/              optional native macOS shell (Tauri) — see app/SETUP-APP.md
 
 ## Notes
 
